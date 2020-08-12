@@ -1,0 +1,4 @@
+rootProject.name = 'project-core'
+
+includeFlat  'game-core'
+includeFlat  'project-config'
