@@ -17,4 +17,6 @@ dependencies {
     compile project(':project-config')
 
     testCompile group: 'junit', name: 'junit', version: '4.12'
+    testCompile group: 'org.apache.poi', name: 'poi-ooxml', version: '4.1.2'
+    testCompile group: 'org.freemarker', name: 'freemarker', version: '2.3.23'
 }
