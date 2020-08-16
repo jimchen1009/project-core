@@ -30,7 +30,7 @@ public class ExcelCellConvertUtil {
 
 	private static void addConverter(ExcelCellConverter cellConverter){
 		converters.put(cellConverter.getType(), cellConverter);
-		ExcelListConverter listConverter = new ExcelListConverter(cellConverter);
+		ExcelListConverter listConverter = new ExcelListConverter(String.format("[%s]", cellConverter.getType()), cellConverter);
 		converters.put(listConverter.getType(), listConverter);
 	}
 

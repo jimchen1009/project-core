@@ -7,8 +7,8 @@ public class ExcelListConverter extends ExcelCellConverter {
 
 	private final ExcelCellConverter cellConverter;
 
-	public ExcelListConverter(ExcelCellConverter cellConverter) {
-		super(String.format("[%s]", cellConverter.getType()), null);
+	public ExcelListConverter(String type, ExcelCellConverter cellConverter) {
+		super(type, null);
 		this.cellConverter = cellConverter;
 	}
 
