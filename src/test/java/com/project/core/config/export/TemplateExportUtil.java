@@ -1,6 +1,6 @@
-package com.project.game.config.export;
+package com.project.core.config.export;
 
-import com.project.game.config.export.excel.ExcelExportUtil;
+import com.project.core.config.export.excel.ExcelExportUtil;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;

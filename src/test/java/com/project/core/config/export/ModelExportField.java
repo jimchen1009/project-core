@@ -1,4 +1,4 @@
-package com.project.game.config.export;
+package com.project.core.config.export;
 
 public class ModelExportField {
 

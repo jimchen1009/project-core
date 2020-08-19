@@ -1,15 +1,18 @@
-package com.project.game.config.export.excel;
+package com.project.core.config.export.excel;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.game.common.config.EvnConfigUtil;
 import com.game.common.config.IEvnConfig;
 import com.game.common.util.DateFormatUtil;
-import com.project.game.config.export.ModelExportField;
-import com.project.game.config.export.ModelFieldConfig;
-import com.project.game.config.export.ModelTypeConfig;
-import com.project.game.config.export.TemplateExportUtil;
+import com.project.config.IDataSource;
+import com.project.core.config.data.DataMapper;
+import com.project.core.config.export.ModelExportField;
+import com.project.core.config.export.ModelFieldConfig;
+import com.project.core.config.export.ModelTypeConfig;
+import com.project.core.config.export.TemplateExportUtil;
 import freemarker.template.TemplateException;
+import jodd.io.FileUtil;
 import jodd.util.StringUtil;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.xssf.usermodel.XSSFCell;
@@ -17,10 +20,18 @@ import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
+import javax.tools.DiagnosticCollector;
+import javax.tools.JavaCompiler;
+import javax.tools.JavaFileObject;
+import javax.tools.StandardJavaFileManager;
+import javax.tools.ToolProvider;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -79,8 +90,10 @@ public class ExcelExportUtil {
 		}
 	}
 
+	private static final Map<String, DataMapper.ConfigClass> name2ConfigClass = DataMapper.getName2ConfigClass();
+
 	private static void exportExcel2JavaClass(String filename, String sheetName, String jsonName, String javaClassName, String javaConfigName,
-											  List<ModelFieldConfig> fieldConfigs, IEvnConfig config) throws IOException, TemplateException {
+											  List<ModelFieldConfig> fieldConfigs, IEvnConfig config) throws IOException, TemplateException, ClassNotFoundException {
 		Map<String, ModelTypeConfig> typeConfigMap = ModelTypeConfig.readTypeConfigMap(config.getConfigList("field.types"));
 		List<ModelExportField> exportFieldList = new ArrayList<>(fieldConfigs.size());
 		for (ModelFieldConfig fieldConfig : fieldConfigs) {
@@ -116,9 +129,12 @@ public class ExcelExportUtil {
 
 
 		if (!StringUtil.isEmpty(javaConfigName)){
+			String javaConfigPackage = String.format("%s.%s", javaPackage, "ext");
+
+			map.put("javaSourceClassName", javaClassName);
 			map.put("javaClassName", javaConfigName);
 			map.put("javaDataPackage", javaPackage);
-			map.put("javaPackage", String.format("%s.%s", javaPackage, "ext"));
+			map.put("javaPackage", javaConfigPackage);
 			String exportConfigName = String.format("%s/%s/%s/%s.java", javaDirectory, javaPackage.replace(".", "/"), "ext", javaConfigName);
 			if (primaryCount == 1){
 				TemplateExportUtil.create("/export/model_config1.ftl", exportConfigName, map, false);
@@ -126,7 +142,51 @@ public class ExcelExportUtil {
 			else if (primaryCount == 2){
 				TemplateExportUtil.create("/export/model_config2.ftl", exportConfigName, map, false);
 			}
+			else {
+				throw new UnsupportedOperationException("primaryCount = " + primaryCount);
+			}
+			if (name2ConfigClass.containsKey(jsonName)) {
+				return;
+			}
+			//先编译好生成的Java文件~
+			compileJava(Arrays.asList(exportDataName, exportName, exportConfigName));
+			@SuppressWarnings("unchecked")
+			Class<? extends IDataSource> dataClass = (Class<? extends IDataSource>)Class.forName(String.format("%s.%s", javaPackage, javaClassName));
+			Class<?> aClass = Class.forName(String.format("%s.%s", javaConfigPackage, javaConfigName));
+			DataMapper.ConfigClass configClass = new DataMapper.ConfigClass(jsonName, dataClass, aClass);
+			name2ConfigClass.put(configClass.getName(), configClass);
+
+			List<DataMapper.ConfigClass> configClassList = new ArrayList<>(name2ConfigClass.values());
+
+			configClassList.sort(Comparator.comparing(DataMapper.ConfigClass::getName));
+			map.put("classConfigList", configClassList);
+			String mapperPackage = DataMapper.class.getPackage().getName();
+			String mapperDirectory = checkAndGetDirectory(config, "mapperPath");
+			String exportMapperName = String.format("%s/%s/%s.java", mapperDirectory, mapperPackage.replace(".", "/"), DataMapper.class.getSimpleName());
+			TemplateExportUtil.create("/export/data_mapper.ftl", exportMapperName, map, true);
 		}
+	}
+
+	private static void compileJava(List<String> exportJavaNameList) throws IOException {
+		JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+		DiagnosticCollector diagnostics = new DiagnosticCollector();
+		StandardJavaFileManager fileManager = compiler.getStandardFileManager(diagnostics, null, null);
+
+		// 建立源文件对象，每个文件被保存在一个从JavaFileObject继承的类中
+		Iterable<? extends JavaFileObject> compilationUnits = fileManager.getJavaFileObjectsFromStrings(exportJavaNameList);
+		// options命令行选项
+		URL resource = IDataSource.class.getResource("");
+		String name = IDataSource.class.getPackage().getName().replace(".", "/");
+		FileUtil.mkdir(resource.getPath() + "/model/ext");
+		int indexOf = resource.getPath().lastIndexOf(name);
+		String substring = resource.getPath().substring(0, indexOf - 1);
+		Iterable<String> options = Arrays.asList("-d", substring);// 指定的路径一定要存在，javac不会自己创建文件夹
+		JavaCompiler.CompilationTask task = compiler.getTask(null, fileManager, diagnostics, options, null, compilationUnits);
+
+		// 编译源程序
+		boolean success = task.call();
+		fileManager.close();
+		System.out.println((success) ? "编译成功" : "编译失败");
 	}
 
 

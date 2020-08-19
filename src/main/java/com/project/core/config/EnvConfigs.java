@@ -1,4 +1,4 @@
-package com.project.game.config;
+package com.project.core.config;
 
 import com.game.common.config.EvnConfigUtil;
 import com.game.common.config.IEvnConfig;
@@ -8,7 +8,7 @@ import java.util.concurrent.TimeUnit;
 
 public class EnvConfigs {
 
-	private static IEvnConfig myConfig = EvnConfigUtil.loadConfig(System.getProperty("project.config.path", "project_config.conf"));
+	private static IEvnConfig myConfig = EvnConfigUtil.loadConfig(System.getProperty("game.project.config.path", "project_config.conf"));
 
 	public static boolean hasPath(String path) {
 		return myConfig.hasPath(path);

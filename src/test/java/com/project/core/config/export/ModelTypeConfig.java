@@ -1,4 +1,4 @@
-package com.project.game.config.export;
+package com.project.core.config.export;
 
 import com.game.common.config.IEvnConfig;
 
