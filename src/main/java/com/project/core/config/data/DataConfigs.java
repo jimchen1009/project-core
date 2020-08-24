@@ -31,10 +31,10 @@ public class DataConfigs {
 		for (IDataSource dataSource : dataSources) {
 			try {
 				reloadDataSourceJson(dataSource);
-				logger.debug("load json[{}] success.", dataSource.getName());
+				logger.debug("load datasource[{}] success.", dataSource.getName());
 			}
 			catch (Throwable t){
-				logger.error("load json[{}] error.", dataSource.getName(), t);
+				logger.error("load datasource[{}] failure.", dataSource.getName(), t);
 			}
 		}
 	}
@@ -52,10 +52,10 @@ public class DataConfigs {
 					IDataSource instanceSource = dataSource.getClass().newInstance();
 					reloadDataSourceJson(instanceSource);
 					class2Sources.put(entry.getKey(), instanceSource);
-					logger.error("onDataSourceReload data source success, name[{}], class:[{}].", name, dataSource.getClass().getSimpleName());
+					logger.error("reload datasource[{}] success, class:[{}].", name, dataSource.getClass().getSimpleName());
 				}
 				catch (Throwable e) {
-					logger.error("onDataSourceReload data source failure, name[{}], class:[{}].", name, dataSource.getClass().getSimpleName(), e);
+					logger.error("reload datasource[{}] failure, class:[{}].", name, dataSource.getClass().getSimpleName(), e);
 				}
 				return;
 			}

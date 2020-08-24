@@ -1,6 +1,7 @@
 package com.project.core.config.export.excel;
 
 import com.project.core.config.export.ModelFieldConfig;
+import com.project.core.config.export.excel.convert.ExcelBoolConverter;
 import com.project.core.config.export.excel.convert.ExcelCellConverter;
 import com.project.core.config.export.excel.convert.ExcelDateConverter;
 import com.project.core.config.export.excel.convert.ExcelDoubleConverter;
@@ -26,6 +27,7 @@ public class ExcelCellConvertUtil {
 		addConverter(new ExcelFloatConverter());
 		addConverter(new ExcelNumberConverter());
 		addConverter(new ExcelLanguageConverter());
+		addConverter(new ExcelBoolConverter());
 	}
 
 	private static void addConverter(ExcelCellConverter cellConverter){

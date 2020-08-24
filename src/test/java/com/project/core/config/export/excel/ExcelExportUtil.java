@@ -82,17 +82,17 @@ public class ExcelExportUtil {
 			}
 			String jsonName = ExcelCellConvertUtil.readString(sheet.getRow(0).getCell(0)) + ".json";
 			String javaClassName = ExcelCellConvertUtil.readString(sheet.getRow(0).getCell(1));
-			String javaConfigName = ExcelCellConvertUtil.readString(sheet.getRow(0).getCell(2));
+			String javaConfigClass = ExcelCellConvertUtil.readString(sheet.getRow(0).getCell(2));
 			int primaryIndex = config.getInt("field.primaryIndex");
 			List<ModelFieldConfig> fieldConfigs = readFieldConfigList(sheet, primaryIndex, firstIndex, lastIndex);
 			exportExcel2Json(sheet, lastIndex, fieldConfigs, jsonName, jsonDirectory);
-			exportExcel2JavaClass(file.getName(), sheetName, jsonName, javaClassName, javaConfigName, fieldConfigs, config);
+			exportExcel2JavaClass(file.getName(), sheetName, jsonName, javaClassName, javaConfigClass, fieldConfigs, config);
 		}
 	}
 
 	private static final Map<String, DataMapper.ConfigClass> name2ConfigClass = DataMapper.getName2ConfigClass();
 
-	private static void exportExcel2JavaClass(String filename, String sheetName, String jsonName, String javaClassName, String javaConfigName,
+	private static void exportExcel2JavaClass(String filename, String sheetName, String jsonName, String javaClassName, String javaConfigClass,
 											  List<ModelFieldConfig> fieldConfigs, IEvnConfig config) throws IOException, TemplateException, ClassNotFoundException {
 		Map<String, ModelTypeConfig> typeConfigMap = ModelTypeConfig.readTypeConfigMap(config.getConfigList("field.types"));
 		List<ModelExportField> exportFieldList = new ArrayList<>(fieldConfigs.size());
@@ -128,14 +128,20 @@ public class ExcelExportUtil {
 		TemplateExportUtil.create("/export/data_source.ftl", exportName, map, true);
 
 
-		if (!StringUtil.isEmpty(javaConfigName)){
-			String javaConfigPackage = String.format("%s.%s", javaPackage, "ext");
+		if (!StringUtil.isEmpty(javaConfigClass)){
+			String mapperDirectory = checkAndGetDirectory(config, "mapperPath");
+
+			int indexOf = javaConfigClass.lastIndexOf(".");
+			String javaConfigName = javaConfigClass.substring(indexOf + 1);
+			String javaConfigPackage = javaConfigClass.substring(0, indexOf);
 
 			map.put("javaSourceClassName", javaClassName);
 			map.put("javaClassName", javaConfigName);
 			map.put("javaDataPackage", javaPackage);
 			map.put("javaPackage", javaConfigPackage);
-			String exportConfigName = String.format("%s/%s/%s/%s.java", javaDirectory, javaPackage.replace(".", "/"), "ext", javaConfigName);
+
+			String javaConfigDirectory = checkAndGetDirectory(String.format("%s/%s", mapperDirectory, javaConfigPackage.replace(".", "/")));
+			String exportConfigName = String.format("%s/%s.java", javaConfigDirectory, javaConfigName);
 			if (primaryCount == 1){
 				TemplateExportUtil.create("/export/model_config1.ftl", exportConfigName, map, false);
 			}
@@ -152,7 +158,7 @@ public class ExcelExportUtil {
 			compileJava(Arrays.asList(exportDataName, exportName, exportConfigName));
 			@SuppressWarnings("unchecked")
 			Class<? extends IDataSource> dataClass = (Class<? extends IDataSource>)Class.forName(String.format("%s.%s", javaPackage, javaClassName));
-			Class<?> aClass = Class.forName(String.format("%s.%s", javaConfigPackage, javaConfigName));
+			Class<?> aClass = Class.forName(javaConfigClass);
 			DataMapper.ConfigClass configClass = new DataMapper.ConfigClass(jsonName, dataClass, aClass);
 			name2ConfigClass.put(configClass.getName(), configClass);
 
@@ -161,7 +167,6 @@ public class ExcelExportUtil {
 			configClassList.sort(Comparator.comparing(DataMapper.ConfigClass::getName));
 			map.put("classConfigList", configClassList);
 			String mapperPackage = DataMapper.class.getPackage().getName();
-			String mapperDirectory = checkAndGetDirectory(config, "mapperPath");
 			String exportMapperName = String.format("%s/%s/%s.java", mapperDirectory, mapperPackage.replace(".", "/"), DataMapper.class.getSimpleName());
 			TemplateExportUtil.create("/export/data_mapper.ftl", exportMapperName, map, true);
 		}
@@ -186,7 +191,7 @@ public class ExcelExportUtil {
 		// 编译源程序
 		boolean success = task.call();
 		fileManager.close();
-		System.out.println((success) ? "编译成功" : "编译失败");
+		System.out.println((success) ? "编译JAVA文件成功" : "编译JAVA文件失败");
 	}
 
 
@@ -208,19 +213,22 @@ public class ExcelExportUtil {
 	}
 
 	private static String checkAndGetDirectory(IEvnConfig config, String path){
-		String jsonDirectory = config.getString(path);
-		File directory = new File(jsonDirectory);
+		return checkAndGetDirectory(config.getString(path));
+	}
+
+	private static String checkAndGetDirectory(String pathDirectory){
+		File directory = new File(pathDirectory);
 		if (directory.exists()){
 			if (!directory.isDirectory()){
-				throw new RuntimeException("不是目录类型:" + jsonDirectory);
+				throw new RuntimeException("不是目录类型:" + pathDirectory);
 			}
 		}
 		else {
 			if (!directory.mkdirs()){
-				throw new RuntimeException("创建目录失败:" + jsonDirectory);
+				throw new RuntimeException("创建目录失败:" + pathDirectory);
 			}
 		}
-		return jsonDirectory;
+		return pathDirectory;
 	}
 
 	/**

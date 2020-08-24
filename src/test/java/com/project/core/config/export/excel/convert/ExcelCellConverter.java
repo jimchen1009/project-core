@@ -1,5 +1,6 @@
 package com.project.core.config.export.excel.convert;
 
+import jodd.util.StringUtil;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.DateUtil;
 import org.apache.poi.xssf.usermodel.XSSFCell;
@@ -40,7 +41,7 @@ public abstract class ExcelCellConverter implements IExcelCellConverter {
 		}
 		else if (cellType.equals(CellType.STRING)){
 			String stringCellValue = xssfCell.getStringCellValue();
-			return string2ClassValue(stringCellValue);
+			return StringUtil.isEmpty(stringCellValue) ? blankClassValue : string2ClassValue(stringCellValue);
 		}
 		else if (cellType.equals(CellType.BLANK)){
 			return blankClassValue;
