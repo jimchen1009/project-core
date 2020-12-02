@@ -37,6 +37,7 @@ public class DataConfigs {
 				logger.error("load datasource[{}] failure.", dataSource.getName(), t);
 			}
 		}
+		class2Sources.values().forEach(DataMapper::touchDataSource);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -52,6 +53,7 @@ public class DataConfigs {
 					IDataSource instanceSource = dataSource.getClass().newInstance();
 					reloadDataSourceJson(instanceSource);
 					class2Sources.put(entry.getKey(), instanceSource);
+					DataMapper.reloadDataSource(instanceSource);
 					logger.error("reload datasource[{}] success, class:[{}].", name, dataSource.getClass().getSimpleName());
 				}
 				catch (Throwable e) {
@@ -110,7 +112,5 @@ public class DataConfigs {
 		String[] readLines = FileUtil.readLines(resourceJson + File.separator + dataSource.getName(), "UTF-8");
 		String jsonString = StringUtil.join(readLines, "\n");
 		dataSource.loadJson(jsonString);
-
-		DataMapper.onDataSourceReload(dataSource);
 	}
 }

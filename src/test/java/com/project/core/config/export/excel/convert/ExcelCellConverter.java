@@ -54,7 +54,7 @@ public abstract class ExcelCellConverter implements IExcelCellConverter {
 		}
 	}
 
-	protected Object double2ClassValue(double numericCellValue){
+	protected Object double2ClassValue(double numericCellValue) throws Exception {
 		throw new UnsupportedOperationException(this.getClass().getSimpleName() + ", 不支持方法.");
 	}
 

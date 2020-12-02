@@ -18,6 +18,15 @@ public class TemplateExportUtil {
 
 	private static final Logger logger = LoggerFactory.getLogger(TemplateExportUtil.class);
 
+	/**
+	 * TODO: 导出的类列表字段需要设置不可修改.
+	 * @param templateName
+	 * @param exportName
+	 * @param paramMap
+	 * @param forceUpdate
+	 * @throws IOException
+	 * @throws TemplateException
+	 */
 	public static void create(String templateName, String exportName, Map<String, Object> paramMap, boolean forceUpdate) throws IOException, TemplateException {
 		File file = new File(exportName);
 		if (!file.getParentFile().exists()) {

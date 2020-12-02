@@ -20,8 +20,8 @@ public class ModelFieldConfig {
 		this.type = type;
 		this.export = export;
 		this.name = name;
-		this.annotation = annotation;
-		this.methodGet = String.format("get%s", capitalizeName());
+		this.annotation = annotation.replace("\n", "\t");
+		this.methodGet = String.format("%s%s", type.equals("bool") ? "is" : "get", capitalizeName());
 		this.methodSet = String.format("set%s", capitalizeName());
 	}
 

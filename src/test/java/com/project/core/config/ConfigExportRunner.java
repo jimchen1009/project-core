@@ -7,7 +7,7 @@ public class ConfigExportRunner {
 
 	@Test
 	public void export() throws Exception {
-		String fileName = "D:\\demo\\project-config\\src\\main\\resources\\export\\excel\\demo.xlsx";
+		String fileName = "D:\\demo\\project-config\\src\\main\\resources\\export\\excel\\skill_fight.xlsx";
 		String configName = "D:\\demo\\project-config\\src\\main\\resources\\export\\excel2json.conf";
 		ExcelExportUtil.exportExcel2JsonAndClass(fileName, configName);
 	}
