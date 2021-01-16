@@ -14,6 +14,7 @@ import com.project.core.config.export.TemplateExportUtil;
 import freemarker.template.TemplateException;
 import jodd.io.FileUtil;
 import jodd.util.StringUtil;
+import org.apache.commons.collections4.map.LinkedMap;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFRow;
@@ -77,7 +78,7 @@ public class ExcelExportUtil {
 			if (sheetName.indexOf("export_") != 0){
 				continue;
 			}
-			if (sheet.getLastRowNum() < lastIndex){
+			if (sheet.getLastRowNum() + 1 < lastIndex){
 				throw new RuntimeException(String.format("页签: %s.%s 行数小于%s,格式错误", file.getName(), sheetName, lastIndex));
 			}
 			String jsonName = ExcelCellConvertUtil.readString(sheet.getRow(0).getCell(0)) + ".json";
@@ -266,14 +267,15 @@ public class ExcelExportUtil {
 
 		StringBuilder builder = new StringBuilder("[");
 		for (int i = 0; i < excelReadConfigValueList.size(); i++) {
-			JSONObject jsonObject = new JSONObject();
+			LinkedMap<String, Object> keyValueMap = new LinkedMap<>();	//按照顺序来导出json表格
 			Map<ModelFieldConfig, Object> readConfigValueMap = excelReadConfigValueList.get(i);
 			for (ModelFieldConfig fieldConfig : fieldConfigs) {
-				jsonObject.put(fieldConfig.getName(), readConfigValueMap.get(fieldConfig));
+				keyValueMap.put(fieldConfig.getName(), readConfigValueMap.get(fieldConfig));
 			}
 			if (i > 0){
 				builder.append(",");
 			}
+			JSONObject jsonObject = new JSONObject(keyValueMap);
 			builder.append("\n\t").append(JSONArray.toJSONString(jsonObject));
 		}
 		builder.append("\n]");

@@ -2,14 +2,11 @@ package com.project.core.config.data;
 
 import com.project.config.IDataSource;
 import com.project.core.config.EnvConfigs;
-import jodd.io.FileUtil;
-import jodd.util.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.util.Collection;
@@ -107,10 +104,9 @@ public class DataConfigs {
 		return dataSourceMap;
 	}
 
-	private static void reloadDataSourceJson(IDataSource dataSource) throws IOException, NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+	private static void reloadDataSourceJson(IDataSource dataSource) throws IOException{
 		String resourceJson = EnvConfigs.getString("configPath.resourceJson");
-		String[] readLines = FileUtil.readLines(resourceJson + File.separator + dataSource.getName(), "UTF-8");
-		String jsonString = StringUtil.join(readLines, "\n");
-		dataSource.loadJson(jsonString);
+		String filePath = resourceJson + File.separator + dataSource.getName();
+		dataSource.loadFile(filePath);
 	}
 }
