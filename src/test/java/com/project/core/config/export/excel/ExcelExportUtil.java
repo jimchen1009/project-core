@@ -37,6 +37,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class ExcelExportUtil {
 
@@ -86,6 +87,8 @@ public class ExcelExportUtil {
 			String javaConfigClass = ExcelCellConvertUtil.readString(sheet.getRow(0).getCell(2));
 			int primaryIndex = config.getInt("field.primaryIndex");
 			List<ModelFieldConfig> fieldConfigs = readFieldConfigList(sheet, primaryIndex, firstIndex, lastIndex);
+			List<String> exportList = config.getList("export");
+			fieldConfigs = fieldConfigs.stream().filter( fieldConfig-> exportList.contains(fieldConfig.getExport())).collect(Collectors.toList());
 			exportExcel2Json(sheet, lastIndex, fieldConfigs, jsonName, jsonDirectory);
 			exportExcel2JavaClass(file.getName(), sheetName, jsonName, javaClassName, javaConfigClass, fieldConfigs, config);
 		}

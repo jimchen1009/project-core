@@ -13,6 +13,8 @@ public class ExcelStringConverter extends ExcelCellConverter {
 
 	@Override
 	protected Object double2ClassValue(double numericCellValue) {
-		return String.valueOf(numericCellValue);
+		long longCellValue = (long) numericCellValue;
+		double decimal = numericCellValue - longCellValue;
+		return decimal > 0 ? String.valueOf(numericCellValue) : String.valueOf(longCellValue);
 	}
 }
