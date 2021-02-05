@@ -16,30 +16,30 @@ import com.project.core.battle.skill.heal.SkillHealUnit;
 
 import java.util.List;
 
-public class BattleControl_RoundEnd extends BattleControl_BattleNode {
+public class BattleControl_RoundEnd extends BattleControl_ReadyNode {
 
 	public BattleControl_RoundEnd(BattleControlId battleControlId) {
 		super(battleControlId, BattleStage.RoundEnd);
 	}
 
 	@Override
-	protected void executeNode(BattleContext battleContext) {
+	protected void executeReadyCommand(BattleContext battleContext) {
 		handleAllBattleUnitEndRoundBuffHeal(battleContext);
 		BattleUtil.foreachBattleUnit(battleContext.getBattle(), BattleUnit::isAlive, battleUnit -> {
 			BuffUtil.decBattleUnitBuffRound(battleContext, battleUnit, BuffDecPoint.EndRound);
 		});
 		BattleUtil.foreachBattleUnitBuffFeature(battleContext.getBattle(), BattleUnit::isAlive, feature -> feature.onBattleEndRound(battleContext));
-		battleContext.setExecuteCompleted(true);
 	}
 
 	@Override
 	protected void onSkipSuccess(BattleContext battleContext) {
+		super.onSkipSuccess(battleContext);
 		BattleUtil.foreachBattleUnit(battleContext.getBattle(), BattleUnit::isAlive, battleUnit -> {
 			BuffUtil.decBattleUnitBuffRound(battleContext, battleUnit, BuffDecPoint.EndRound);
 		});
 	}
 
-	protected void handleAllBattleUnitEndRoundBuffHeal(BattleContext battleContext) {
+	private void handleAllBattleUnitEndRoundBuffHeal(BattleContext battleContext) {
 		SkillEffectContext effectContext = new SkillEffectContext();
 		BattleUtil.foreachBattleUnit(battleContext.getBattle(), BattleUnit::isAlive, battleUnit -> {
 			List<Buff> buffList = battleUnit.getBuffContainer().getBuffList();

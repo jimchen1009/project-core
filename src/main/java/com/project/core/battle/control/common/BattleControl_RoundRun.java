@@ -31,7 +31,7 @@ public abstract class BattleControl_RoundRun extends BattleControl_TeamUnit<Oper
 	}
 
 	@Override
-	protected final TupleCode<OperateSkills> getExecuteCommand(BattleContext battleContext, OperateSkills requestCommand) {
+	protected TupleCode<OperateSkills> getTeamUnitCommand(BattleContext battleContext, OperateSkills requestCommand) {
 		List<OperateSkill> operateList = new ArrayList<>();
 		BattleUnitManager battleUnitManager = battleContext.getBattle().getBattleUnitManager();
 		for (OperateSkill operate : requestCommand.getOperateList()) {

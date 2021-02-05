@@ -1,8 +1,10 @@
-package com.project.core.battle.control;
+package com.project.core.battle.control.common;
 
 import com.project.core.battle.Battle;
 import com.project.core.battle.BattleContext;
 import com.project.core.battle.BattleUtil;
+import com.project.core.battle.control.BattleControlId;
+import com.project.core.battle.control.BattleControlList;
 
 public class BattleControl_RoundLoop extends BattleControlList {
 

@@ -14,6 +14,8 @@ public class BattleStage{
 
 	public static BattleStage RoundRunTeam = new BattleStage(4 * MAX_ID, "执行回合");
 
+	public static BattleStage PlayRunTeam = new BattleStage(5 * MAX_ID, "回合播放");
+
 	public static BattleStage RoundEnd = new BattleStage(6 * MAX_ID, "结束回合");
 
 	public static BattleStage BattleEnd = new BattleStage(7 * MAX_ID, "结束战斗");

@@ -13,7 +13,7 @@ public abstract class BattleControl_Command<T, E> extends BattleControl_BattleNo
 		super(battleControlId, battleStage);
 	}
 
-	@SuppressWarnings("unchecked")
+
 	@Override
 	protected final ResultCode executeCondition(BattleContext battleContext) {
 		ResultCode resultCode = super.executeCondition(battleContext);
@@ -27,7 +27,7 @@ public abstract class BattleControl_Command<T, E> extends BattleControl_BattleNo
 		}
 		TupleCode<E> tupleCode;
 		if (!battleContext.isExecuteAI()) {
-			T requestCommand = (T)battleContext.getRequestCommand();
+			T requestCommand = battleContext.getRequestCommand();
 			if (requestCommand == null) {
 				return ResultCode.BATTLE_PARAM_SUPPORT;
 			}

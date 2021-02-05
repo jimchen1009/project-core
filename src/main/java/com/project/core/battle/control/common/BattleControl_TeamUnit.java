@@ -1,5 +1,7 @@
 package com.project.core.battle.control.common;
 
+import com.game.common.util.ResultCode;
+import com.game.common.util.TupleCode;
 import com.project.core.battle.Battle;
 import com.project.core.battle.BattleContext;
 import com.project.core.battle.BattleStage;
@@ -8,14 +10,10 @@ import com.project.core.battle.BattleTeamUnit;
 import com.project.core.battle.BattleUnit;
 import com.project.core.battle.control.BattleControlId;
 import com.project.core.battle.control.BattleControl_Command;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
 public abstract class BattleControl_TeamUnit<T, E> extends BattleControl_Command<T, E> {
-
-	private static final Logger logger = LoggerFactory.getLogger(BattleControl_TeamUnit.class);
 
 	protected final int teamUnitIndex;
 
@@ -28,6 +26,19 @@ public abstract class BattleControl_TeamUnit<T, E> extends BattleControl_Command
 		return BattleTeamType.getIndexTeamType(teamUnitIndex);
 	}
 
+	@Override
+	protected final TupleCode<E> getExecuteCommand(BattleContext battleContext, T requestCommand) {
+		Battle battle = battleContext.getBattle();
+		BattleTeamUnit battleTeamUnit = battle.getBattleUnitManager().getIndexBattleTeamUnit(teamUnitIndex);
+		if (!battleTeamUnit.getAllUnitUserIds().contains(battleContext.getOperateUserId())) {
+			return new TupleCode<>(ResultCode.BATTLE_CONTROL_NOT_SUPPORT);
+		}
+		return getTeamUnitCommand(battleContext, requestCommand);
+	}
+
+	protected abstract TupleCode<E> getTeamUnitCommand(BattleContext battleContext, T requestCommand);
+
+	@Override
 	protected final boolean executeCommand(BattleContext battleContext) {
 		Battle battle = battleContext.getBattle();
 		BattleTeamUnit battleTeamUnit = battle.getBattleUnitManager().getIndexBattleTeamUnit(teamUnitIndex);

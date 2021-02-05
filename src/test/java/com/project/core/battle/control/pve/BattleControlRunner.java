@@ -25,6 +25,7 @@ public class BattleControlRunner {
 	private static List<Integer> skillConfigIds3 = Arrays.asList(41200307, 41200308, 41200309);
 
 	private static final List<TeamConfig> TeamAConfigList = Arrays.asList(
+			new TeamConfig(10093, skillConfigIds0),
 			new TeamConfig(10093, skillConfigIds1)
 	);
 
@@ -49,10 +50,11 @@ public class BattleControlRunner {
 			teamUnitDataB.setInitializeCd(true);
 		}).build("PVE", 0);
 		battleData.setMaxRound(10000);
-		Battle battle = BattleControlService.createBattle(BattleType.PVE, battleData);
+		Battle battle = BattleControlService.createBattle(BattleType.PVP, battleData);
 
 		for (int i = 0; i < battleData.getMaxRound() * 10; i++) {
 			BattleControlService.executeAI(1, battle);
+			BattleControlService.executeAI(2, battle);
 		}
 		BattleWinLos battleWinLos = battle.getBattleWinLos();
 		System.out.println("战斗回合: " + battleData.getCurRound() + ", 结果: " + battleWinLos);

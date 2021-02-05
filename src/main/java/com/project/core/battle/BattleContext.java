@@ -50,8 +50,9 @@ public class BattleContext implements IBattleContext {
 		return current;
 	}
 
-	public Object getRequestCommand() {
-		return requestCommand == null ? DEFAULT_OBJ : requestCommand;
+	@SuppressWarnings("unchecked")
+	public <T> T getRequestCommand() {
+		return requestCommand == null ? (T)DEFAULT_OBJ : (T)requestCommand;
 	}
 
 	public BattleContext setRequestCommand(Object requestCommand) {

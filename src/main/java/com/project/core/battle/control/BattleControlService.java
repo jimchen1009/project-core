@@ -5,12 +5,16 @@ import com.game.common.util.TupleCode;
 import com.project.core.battle.Battle;
 import com.project.core.battle.BattleContext;
 import com.project.core.battle.BattleStage;
+import com.project.core.battle.BattleTeamType;
 import com.project.core.battle.control.common.BattleControl_BattleBegin;
 import com.project.core.battle.control.common.BattleControl_BattleEnd;
 import com.project.core.battle.control.common.BattleControl_BattleLine;
 import com.project.core.battle.control.common.BattleControl_RoundBegin;
 import com.project.core.battle.control.common.BattleControl_RoundEnd;
+import com.project.core.battle.control.common.BattleControl_RoundLoop;
 import com.project.core.battle.control.pve.BattleControl_RoundRunPVE;
+import com.project.core.battle.control.pvp.BattleControl_PlayRoundPVP;
+import com.project.core.battle.control.pvp.BattleControl_RoundRunPVP;
 import com.project.core.battle.model.BattleData;
 
 import java.util.HashMap;
@@ -27,6 +31,7 @@ public class BattleControlService {
 
 	static {
 		type2ControlMap.put(BattleType.PVE, createBattlePVEControl());
+		type2ControlMap.put(BattleType.PVP, createBattlePVPControl());
 	}
 
 	private static BattleControl createBattlePVEControl(){
@@ -34,7 +39,11 @@ public class BattleControlService {
 	}
 
 	private static BattleControl createBattlePVPControl(){
-		return createBattleControl(BattleType.PVE, battleRoundControl -> {
+		return createBattleControl(BattleType.PVP, battleRoundControl -> {
+			battleRoundControl.addBattleControl( battleControlId -> new BattleControl_RoundRunPVP(battleControlId, BattleTeamType.TeamA));
+			battleRoundControl.addBattleControl( battleControlId -> new BattleControl_PlayRoundPVP(battleControlId, BattleTeamType.TeamA));
+			battleRoundControl.addBattleControl( battleControlId -> new BattleControl_RoundRunPVP(battleControlId, BattleTeamType.TeamB));
+			battleRoundControl.addBattleControl( battleControlId -> new BattleControl_PlayRoundPVP(battleControlId, BattleTeamType.TeamB));
 		});
 	}
 
