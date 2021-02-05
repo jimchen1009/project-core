@@ -33,12 +33,12 @@ public abstract class BattleControl_ReadyNode extends BattleControl_Command<Obje
 	}
 
 	@Override
-	protected TupleCode<Long> getExecuteCommand(BattleContext battleContext, Object requestCommand) {
+	protected final TupleCode<Long> getExecuteCommand(BattleContext battleContext, Object requestCommand) {
 		return new TupleCode<>(System.currentTimeMillis());
 	}
 
 	@Override
-	protected TupleCode<Long> getExecuteAICommand(BattleContext battleContext) {
+	protected final TupleCode<Long> getExecuteAICommand(BattleContext battleContext) {
 		Date initializeDate = battleContext.getBattle().getControlManager().getCtrlInitializeDate();
 		long currentTime = battleContext.getCurrent().getTime();
 		if (currentTime - initializeDate.getTime() < delayAiDuration) {

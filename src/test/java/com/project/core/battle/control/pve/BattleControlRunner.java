@@ -17,6 +17,9 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 public class BattleControlRunner {
 
@@ -25,11 +28,11 @@ public class BattleControlRunner {
 	private static List<Integer> skillConfigIds3 = Arrays.asList(41200307, 41200308, 41200309);
 
 	private static final List<TeamConfig> TeamAConfigList = Arrays.asList(
-			new TeamConfig(10093, skillConfigIds0),
 			new TeamConfig(10093, skillConfigIds1)
 	);
 
 	private static final List<TeamConfig> TeamBConfigList = Arrays.asList(
+			new TeamConfig(11090, skillConfigIds1),
 			new TeamConfig(11090, skillConfigIds3)
 	);
 
@@ -39,25 +42,43 @@ public class BattleControlRunner {
 	public void runPVEBattle(){
 		System.setProperty("game.project.config.path", "D:/demo/project-core/src/main/resources/project_config.conf");
 		DataConfigs.init();
+		executePVEAI();
+//		executePVPAI();
+	}
+
+	private Battle executePVEAI(){
+		return executeAI(BattleType.PVP, battle -> {
+			BattleControlService.executeAI(1, battle);
+		}, userId -> userId % 2);
+	}
+
+
+	private Battle executePVPAI(){
+		return executeAI(BattleType.PVP, battle -> {
+			BattleControlService.executeAI(1, battle);
+			BattleControlService.executeAI(2, battle);
+		}, userId -> userId);
+	}
+
+	private Battle executeAI(BattleType battleType, Consumer<Battle> consumer, Function<Long, Long> function){
 		List<BattleUnitData> teamADataUnitList = new ArrayList<>();
 		List<BattleUnitData> teamBDataUnitList = new ArrayList<>();
 		for (int i = 0; i < TeamUnit; i++) {
-			teamADataUnitList.add(createBattleUnit(1, i, TeamAConfigList.get(i)));
-			teamBDataUnitList.add(createBattleUnit(2, i, TeamBConfigList.get(i)));
+			teamADataUnitList.add(createBattleUnit(function.apply(1L), i, TeamAConfigList.get(i)));
+			teamBDataUnitList.add(createBattleUnit(function.apply(2L), i, TeamBConfigList.get(i)));
 		}
 		BattleData battleData = new BattleDataBuilder().addTeamUnitWithEnemy(teamADataUnitList, teamBDataUnitList, (teamUnitDataA, teamUnitDataB) -> {
 			teamUnitDataA.setInitializeCd(true);
 			teamUnitDataB.setInitializeCd(true);
 		}).build("PVE", 0);
 		battleData.setMaxRound(10000);
-		Battle battle = BattleControlService.createBattle(BattleType.PVP, battleData);
-
+		Battle battle = BattleControlService.createBattle(battleType, battleData);
 		for (int i = 0; i < battleData.getMaxRound() * 10; i++) {
-			BattleControlService.executeAI(1, battle);
-			BattleControlService.executeAI(2, battle);
+			consumer.accept(battle);
 		}
 		BattleWinLos battleWinLos = battle.getBattleWinLos();
 		System.out.println("战斗回合: " + battleData.getCurRound() + ", 结果: " + battleWinLos);
+		return battle;
 	}
 
 	private BattleUnitData createBattleUnit(long userId, int index, TeamConfig teamConfigA){

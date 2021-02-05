@@ -13,6 +13,11 @@ import com.project.core.battle.control.BattleControl_Command;
 
 import java.util.List;
 
+/**
+ * 一支队伍
+ * @param <T> 请求的参数
+ * @param <E> 处理的参数
+ */
 public abstract class BattleControl_TeamUnit<T, E> extends BattleControl_Command<T, E> {
 
 	protected final int teamUnitIndex;
