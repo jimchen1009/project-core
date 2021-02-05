@@ -3,6 +3,7 @@ package com.project.core.battle.selector;
 import com.project.core.battle.BattleContext;
 import com.project.core.battle.BattleTeamUnit;
 import com.project.core.battle.BattleUnit;
+import com.project.core.battle.BattleUtil;
 import com.project.core.battle.condition.IConditionContext;
 import com.project.core.battle.skill.BattleSkill;
 
@@ -17,7 +18,7 @@ public class BattleUnitSelector_OneEnemy extends BattleUnitSelectorTeamUnitOne {
 
 	@Override
 	public List<BattleUnit> selectBattleUnits(BattleContext context, IConditionContext conditionContext, BattleUnit requestUnit, BattleSkill battleSkill, BattleUnit targetUnit) {
-		BattleTeamUnit enemyTeamUnit = getEnemyTeamUnit(context, requestUnit);
+		BattleTeamUnit enemyTeamUnit = BattleUtil.getEnemyTeamUnit(context.getBattle(), requestUnit.getTeamUnit());
 		if (enemyTeamUnit == null){
 			return Collections.emptyList();
 		}

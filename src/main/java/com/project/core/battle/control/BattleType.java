@@ -4,6 +4,7 @@ import com.game.common.util.IEnumBase;
 
 public enum BattleType implements IEnumBase {
 	PVE(1),
+	PVP(2),
 	;
 
 	private final int id;

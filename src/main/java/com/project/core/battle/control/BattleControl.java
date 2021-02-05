@@ -15,7 +15,7 @@ public abstract class BattleControl implements IBattleControl {
 	}
 
 	@Override
-	public BattleControlId getBattleControlId() {
+	public final BattleControlId getBattleControlId() {
 		return battleControlId;
 	}
 
@@ -25,19 +25,19 @@ public abstract class BattleControl implements IBattleControl {
 
 	@Override
 	public final ResultCode execute(BattleContext battleContext) {
-		ResultCode resultCode = checkCondition(battleContext);
+		ResultCode resultCode = executeCondition(battleContext);
 		if (resultCode.isSuccess()) {
 			resultCode = execute0(battleContext);
 		}
 		return resultCode;
 	}
 
-	protected abstract ResultCode checkCondition(BattleContext battleContext);
+	protected abstract ResultCode executeCondition(BattleContext battleContext);
 
 	protected abstract ResultCode execute0(BattleContext battleContext);
 
 	@Override
-	public ResultCode skip(BattleContext battleContext) {
+	public final ResultCode skip(BattleContext battleContext) {
 		return skip0(battleContext);
 	}
 
@@ -50,13 +50,13 @@ public abstract class BattleControl implements IBattleControl {
 
 	protected abstract void interrupt0(BattleContext battleContext, BattleInterrupt battleInterrupt);
 
-	protected <T> T getControlCache(BattleContext battleContext, Supplier<T> supplier){
+	protected final <T> T getControlCache(BattleContext battleContext, Supplier<T> supplier){
 		BattleControlManager controlManager = battleContext.getBattle().getControlManager();
 		T controlCache = controlManager.getCache(getBattleControlId(), supplier);
 		return controlCache;
 	}
 
-	protected void setControlCache(BattleContext battleContext, Object controlCache){
+	protected final void setControlCache(BattleContext battleContext, Object controlCache){
 		BattleControlManager controlManager = battleContext.getBattle().getControlManager();
 		controlManager.addCache(getBattleControlId(), controlCache);
 	}

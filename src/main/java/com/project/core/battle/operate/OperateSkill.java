@@ -1,21 +1,21 @@
 package com.project.core.battle.operate;
 
-public class BattleOperate {
+public class OperateSkill {
 
-	private final long operatorId;
+	private final long requestId;
 	private long targetId;
 	private int useSkillId;
 	private boolean selectByAI;
 
-	public BattleOperate(long operatorId, long targetId, int useSkillId) {
-		this.operatorId = operatorId;
+	public OperateSkill(long requestId, long targetId, int useSkillId) {
+		this.requestId = requestId;
 		this.targetId = targetId;
 		this.useSkillId = useSkillId;
 		this.selectByAI = false;
 	}
 
-	public long getOperatorId() {
-		return operatorId;
+	public long getRequestId() {
+		return requestId;
 	}
 
 	public long getTargetId() {
@@ -38,12 +38,12 @@ public class BattleOperate {
 		return selectByAI;
 	}
 
-	public BattleOperate setSelectByAI(boolean selectByAI) {
+	public OperateSkill setSelectByAI(boolean selectByAI) {
 		this.selectByAI = selectByAI;
 		return this;
 	}
 
-	public BattleOperate resetOperate(long targetId, int useSkillId){
-		return new BattleOperate(operatorId, targetId, useSkillId).setSelectByAI(selectByAI);
+	public OperateSkill resetOperate(long targetId, int useSkillId){
+		return new OperateSkill(requestId, targetId, useSkillId).setSelectByAI(selectByAI);
 	}
 }

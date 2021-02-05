@@ -24,6 +24,7 @@ public class BattleContext implements IBattleContext {
 	private final long operateUserId;
 	private Object requestCommand;				//具体的请求参数
 	private Object executeCommand;				//具体的执行参数
+	private boolean executeAI;
 	private boolean executeCompleted;
 
 	public BattleContext(long operateUserId, Battle battle) {
@@ -33,6 +34,7 @@ public class BattleContext implements IBattleContext {
 		this.battleContext = new HashMap<>();
 		this.battleUnitContextMap = new HashMap<>();
 		this.actorPlayer = new ActorPlayer();
+		this.executeAI = false;
 		this.executeCompleted = false;
 	}
 
@@ -65,6 +67,13 @@ public class BattleContext implements IBattleContext {
 		this.executeCommand = executeCommand;
 	}
 
+	public boolean isExecuteAI() {
+		return executeAI;
+	}
+
+	public void setExecuteAI(boolean executeAI) {
+		this.executeAI = executeAI;
+	}
 
 	public boolean isExecuteCompleted() {
 		return executeCompleted;

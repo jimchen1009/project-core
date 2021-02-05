@@ -18,11 +18,6 @@ public abstract class BattleUnitSelector implements IBattleUnitSelector {
 		this.predicate = predicate;
 	}
 
-	protected BattleTeamUnit getEnemyTeamUnit(BattleContext context, BattleUnit battleUnit){
-		int enemyUnitIndex = battleUnit.getTeamUnit().getEnemyUnitIndex();
-		return context.getBattle().getBattleUnitManager().getIndexBattleTeamUnit(enemyUnitIndex);
-	}
-
 	protected List<BattleUnit> getBattleUnitList(BattleTeamUnit battleTeamUnit, IConditionContext conditionContext, BattleSkill battleSkill){
 		return battleTeamUnit.getBattleUnitList( battleUnit -> battleUnit.getUnitType().isSelectSupport() && predicate.test(battleUnit));
 	}

@@ -23,7 +23,7 @@ public class BattleControl_RoundEnd extends BattleControl_BattleNode {
 	}
 
 	@Override
-	protected void execute1(BattleContext battleContext) {
+	protected void executeNode(BattleContext battleContext) {
 		handleAllBattleUnitEndRoundBuffHeal(battleContext);
 		BattleUtil.foreachBattleUnit(battleContext.getBattle(), BattleUnit::isAlive, battleUnit -> {
 			BuffUtil.decBattleUnitBuffRound(battleContext, battleUnit, BuffDecPoint.EndRound);

@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.BiFunction;
+import java.util.function.Consumer;
 
 public class BattleControlService {
 
@@ -29,18 +30,28 @@ public class BattleControlService {
 	}
 
 	private static BattleControl createBattlePVEControl(){
-		BattleControl_BattleLine battleLine = new BattleControl_BattleLine(new BattleControlId(BattleType.PVE.name()));
+		return createBattleControl(BattleType.PVE, battleRoundControl -> battleRoundControl.addBattleControl(BattleControl_RoundRunPVE::new));
+	}
+
+	private static BattleControl createBattlePVPControl(){
+		return createBattleControl(BattleType.PVE, battleRoundControl -> {
+		});
+	}
+
+	private static BattleControl createBattleControl(BattleType battleType, Consumer<BattleControl_RoundLoop> consumer){
+		BattleControl_BattleLine battleLine = new BattleControl_BattleLine(new BattleControlId(battleType.name()));
 		battleLine.addBattleControl(BattleControl_BattleBegin::new);
 		battleLine.addBattleControl(battleControlId -> {
 			BattleControl_RoundLoop BattleRoundLoop = new BattleControl_RoundLoop(battleControlId);
 			BattleRoundLoop.addBattleControl(BattleControl_RoundBegin::new);
-			BattleRoundLoop.addBattleControl(BattleControl_RoundRunPVE::new);
+			consumer.accept(BattleRoundLoop);
 			BattleRoundLoop.addBattleControl(BattleControl_RoundEnd::new);
 			return BattleRoundLoop;
 		});
 		battleLine.addBattleControl(BattleControl_BattleEnd::new);
 		return battleLine;
 	}
+
 
 	public static BattleControl getBattleControl(BattleType battleType){
 		return type2ControlMap.get(battleType);
@@ -54,21 +65,36 @@ public class BattleControlService {
 		battleControl.onInitialization(battleContext);
 		return battle;
 	}
+
 	/**
-	 *
 	 * @param battle
 	 * @param requestCommand 执行命令
 	 * @return
 	 */
 	public static TupleCode<BattleContext> execute(long operateUserId, Battle battle, Object requestCommand){
-		TupleCode<BattleContext> resultCode = execute(operateUserId, battle, (battleControl, battleContext) -> {
-			battleContext.setRequestCommand(requestCommand);
+		return execute(operateUserId, battle, battleContext -> battleContext.setRequestCommand(requestCommand));
+	}
+
+	/**
+	 * 执行AI
+	 * @param operateUserId
+	 * @param battle
+	 * @return
+	 */
+	public static TupleCode<BattleContext> executeAI(long operateUserId, Battle battle){
+		return execute(operateUserId, battle, battleContext -> battleContext.setExecuteAI(true));
+	}
+
+
+	private static TupleCode<BattleContext> execute(long operateUserId, Battle battle, Consumer<BattleContext> consumer){
+		TupleCode<BattleContext> resultCode = invoke(operateUserId, battle, (battleControl, battleContext) -> {
+			consumer.accept(battleContext);
 			return battleControl.execute(battleContext);
 		});
 		if (resultCode.isSuccess()){
 			TupleCode<BattleContext> skipCode = resultCode;
 			while (skipCode.isSuccess()){
-				skipCode = execute(operateUserId, battle, BattleControl::skip);
+				skipCode = invoke(operateUserId, battle, BattleControl::skip);
 			}
 			BattleContext battleContext = resultCode.getData();
 			System.out.println("执行结果:" + battleContext.getActorPlayer() + "\n");
@@ -76,7 +102,7 @@ public class BattleControlService {
 		return resultCode;
 	}
 
-	private static TupleCode<BattleContext> execute(long operateUserId, Battle battle, BiFunction<BattleControl, BattleContext, ResultCode> function){
+	private static TupleCode<BattleContext> invoke(long operateUserId, Battle battle, BiFunction<BattleControl, BattleContext, ResultCode> function){
 		if (battle.isBattleStage(BattleStage.BattleFinal)) {
 			return new TupleCode<>(ResultCode.BATTLE_CONTROL_TAG);
 		}

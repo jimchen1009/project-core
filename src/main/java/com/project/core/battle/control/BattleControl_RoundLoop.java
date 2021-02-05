@@ -21,7 +21,5 @@ public class BattleControl_RoundLoop extends BattleControlList {
 		Battle battle = battleContext.getBattle();
 		battle.getData().incBattleRound();
 		battle.updateBattleWinLos();
-		battle.getOperateManager().removeAllOperates();
-		BattleUtil.updateChangeEnemyTeamUnit(battleContext.getBattle());
 	}
 }

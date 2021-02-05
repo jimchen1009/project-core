@@ -1,5 +1,6 @@
 package com.project.core.battle.operate;
 
+import com.game.common.util.RandomUtil;
 import com.project.core.battle.BattleUnit;
 
 import java.util.ArrayList;
@@ -8,30 +9,30 @@ import java.util.List;
 public class OperateContext {
 
 	private final BattleUnit battleUnit;
-	private final BattleOperate operate;
+	private final OperateSkill operate;
 
-	private List<BattleOperate> resetOperateList;
+	private List<OperateSkill> resetOperateList;
 
-	public OperateContext(BattleUnit battleUnit, BattleOperate operate) {
+	public OperateContext(BattleUnit battleUnit, OperateSkill operate) {
 		this.battleUnit = battleUnit;
 		this.operate = operate;
 	}
 
-	public BattleOperate getOperate() {
+	public OperateSkill getOperate() {
 		return operate;
 	}
 
-	public void addResetOperate(BattleOperate resetOperate){
+	public void addResetOperate(OperateSkill resetOperate){
 		if (resetOperateList == null) {
 			resetOperateList = new ArrayList<>();
 		}
 		resetOperateList.add(resetOperate);
 	}
 
-	public BattleOperate getFinalOperate(){
+	public OperateSkill getFinalOperate(){
 		/**
 		 * 在有多个重置效果的情况下,需要
 		 */
-		return resetOperateList == null ? operate : resetOperateList.get(0);
+		return resetOperateList == null ? operate : RandomUtil.select(resetOperateList);
 	}
 }

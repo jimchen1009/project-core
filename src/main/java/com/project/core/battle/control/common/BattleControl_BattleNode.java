@@ -13,7 +13,7 @@ public abstract class BattleControl_BattleNode extends BattleControl_Node {
 	}
 
 	@Override
-	protected boolean skip1(BattleContext battleContext) {
+	protected final boolean skipNode(BattleContext battleContext) {
 		Battle battle = battleContext.getBattle();
 		if (!battle.hasBattleWinLos()) {
 			return false;

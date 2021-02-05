@@ -1,7 +1,6 @@
 package com.project.core.battle.control.pve;
 
 import com.project.core.battle.Battle;
-import com.project.core.battle.BattleStage;
 import com.project.core.battle.BattleUnitType;
 import com.project.core.battle.BattleWinLos;
 import com.project.core.battle.attribute.AttributeConfig;
@@ -12,14 +11,11 @@ import com.project.core.battle.model.BattleData;
 import com.project.core.battle.model.BattleDataBuilder;
 import com.project.core.battle.model.BattleSkillData;
 import com.project.core.battle.model.BattleUnitData;
-import com.project.core.battle.operate.BattleOperate;
-import com.project.core.battle.operate.BattleOperates;
 import com.project.core.config.data.DataConfigs;
 import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 public class BattleControlRunner {
@@ -56,10 +52,7 @@ public class BattleControlRunner {
 		Battle battle = BattleControlService.createBattle(BattleType.PVE, battleData);
 
 		for (int i = 0; i < battleData.getMaxRound() * 10; i++) {
-			BattleStage battleStage = BattleStage.RoundRunTeam.crateChild(1);
-			BattleOperate battleOperate = new BattleOperate(1, 0, 0);
-			Object requestCommand = battle.isBattleStage(battleStage) ? new BattleOperates(1, Collections.singletonList(battleOperate)) : null;
-			BattleControlService.execute(1, battle, requestCommand);
+			BattleControlService.executeAI(1, battle);
 		}
 		BattleWinLos battleWinLos = battle.getBattleWinLos();
 		System.out.println("战斗回合: " + battleData.getCurRound() + ", 结果: " + battleWinLos);

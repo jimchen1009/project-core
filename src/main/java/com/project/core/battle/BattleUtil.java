@@ -3,6 +3,8 @@ package com.project.core.battle;
 import com.game.common.util.CommonUtil;
 import com.project.core.battle.buff.BuffUtil;
 import com.project.core.battle.buff.featrue.IBuffFeature;
+import com.project.core.battle.result.ActorPlay;
+import com.project.core.battle.result.ActorType;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -122,14 +124,14 @@ public class BattleUtil {
 
 	/**
 	 * 自动切换敌对阵型
-	 * @param battle
+	 * @param battleContext
 	 */
-	public static void updateChangeEnemyTeamUnit(Battle battle) {
-		BattleUnitManager unitManager = battle.getBattleUnitManager();
+	public static void updateChangeEnemyTeamUnit(BattleContext battleContext) {
+		BattleUnitManager unitManager = battleContext.getBattle().getBattleUnitManager();
 		List<BattleTeamUnit> teamUnitListA = unitManager.getBattleTeam(BattleTeamType.TeamA).getTeamUnitList(BattleTeamUnit::isAlive);
 		List<BattleTeamUnit> teamUnitListB = unitManager.getBattleTeam(BattleTeamType.TeamB).getTeamUnitList(BattleTeamUnit::isAlive);
-		updateChangeEnemyTeamUnit(battle, teamUnitListA, teamUnitListB);
-		updateChangeEnemyTeamUnit(battle, teamUnitListB, teamUnitListA);
+		updateChangeEnemyTeamUnit(battleContext, teamUnitListA, teamUnitListB);
+		updateChangeEnemyTeamUnit(battleContext, teamUnitListB, teamUnitListA);
 	}
 
 	/**
@@ -137,7 +139,7 @@ public class BattleUtil {
 	 * @param teamUnitListA
 	 * @param teamUnitListB
 	 */
-	private static void updateChangeEnemyTeamUnit(Battle battle, List<BattleTeamUnit> teamUnitListA, List<BattleTeamUnit> teamUnitListB) {
+	private static void updateChangeEnemyTeamUnit(BattleContext battleContext, List<BattleTeamUnit> teamUnitListA, List<BattleTeamUnit> teamUnitListB) {
 		if (teamUnitListB.isEmpty()){
 			return;
 		}
@@ -145,8 +147,20 @@ public class BattleUtil {
 			if (CommonUtil.findOneUtilOkayBool(teamUnitListB, teamUnit -> teamUnit.getEnemyUnitIndex() == battleTeamUnit.getTeamUnitIndex())) {
 				continue;
 			}
-			BattleTeamUnit teamUnit = battle.getRandom().select(teamUnitListB);
-			battleTeamUnit.setEnemyUnitIndex(teamUnit.getTeamUnitIndex());
+			BattleTeamUnit enemyTeamUnit = battleContext.getBattle().getRandom().select(teamUnitListB);
+			battleTeamUnit.setEnemyUnitIndex(enemyTeamUnit.getTeamUnitIndex());
+			battleContext.addActorPlayer(new ActorPlay(battleTeamUnit.getTeamUnitIndex(), enemyTeamUnit.getEnemyUnitIndex(), ActorType.EnemyUnit, battleTeamUnit.getTeamUnitIndex()));
 		}
+	}
+
+	/**
+	 * 获取敌对的阵型
+	 * @param battle
+	 * @param teamUnit
+	 * @return
+	 */
+	public static BattleTeamUnit getEnemyTeamUnit(Battle battle, BattleTeamUnit teamUnit){
+		int enemyUnitIndex = teamUnit.getEnemyUnitIndex();
+		return battle.getBattleUnitManager().getIndexBattleTeamUnit(enemyUnitIndex);
 	}
 }

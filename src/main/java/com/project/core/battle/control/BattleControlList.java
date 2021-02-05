@@ -50,7 +50,7 @@ public class BattleControlList extends BattleControl implements IBattleControlLi
 	}
 
 	@Override
-	protected ResultCode checkCondition(BattleContext battleContext) {
+	protected ResultCode executeCondition(BattleContext battleContext) {
 		if (executeCompletedAll(battleContext)) {
 			return ResultCode.BATTLE_CONTROL_END;
 		}

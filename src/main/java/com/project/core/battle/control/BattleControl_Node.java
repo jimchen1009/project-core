@@ -19,7 +19,7 @@ public abstract class BattleControl_Node extends BattleControl implements IBattl
 	}
 
 	@Override
-	public BattleStage getBattleStage() {
+	public final BattleStage getBattleStage() {
 		return battleStage;
 	}
 
@@ -32,7 +32,7 @@ public abstract class BattleControl_Node extends BattleControl implements IBattl
 	}
 
 	@Override
-	protected ResultCode checkCondition(BattleContext battleContext) {
+	protected ResultCode executeCondition(BattleContext battleContext) {
 		if (!battleContext.getBattle().isBattleStage(this.battleStage)) {
 			return ResultCode.BATTLE_STAGE_ERROR;
 		}
@@ -41,16 +41,16 @@ public abstract class BattleControl_Node extends BattleControl implements IBattl
 
 	@Override
 	protected final ResultCode execute0(BattleContext battleContext) {
-		execute1(battleContext);
+		executeNode(battleContext);
 		System.out.println("阶段[" + battleStage.getComment() + "] 执行");
 		return ResultCode.SUCCESS;
 	}
 
-	protected abstract void execute1(BattleContext battleContext);
+	protected abstract void executeNode(BattleContext battleContext);
 
 	@Override
 	protected final ResultCode skip0(BattleContext battleContext) {
-		boolean success = skip1(battleContext);
+		boolean success = skipNode(battleContext);
 		if (success){
 			return ResultCode.SUCCESS;
 		}
@@ -59,14 +59,14 @@ public abstract class BattleControl_Node extends BattleControl implements IBattl
 		}
 	}
 
-	protected abstract boolean skip1(BattleContext battleContext);
+	protected abstract boolean skipNode(BattleContext battleContext);
 
 	@Override
 	protected final void interrupt0(BattleContext battleContext, BattleInterrupt battleInterrupt) {
-		interrupt1(battleContext, battleInterrupt);
+		interruptNode(battleContext, battleInterrupt);
 	}
 
-	protected void interrupt1(BattleContext battleContext, BattleInterrupt battleInterrupt){
+	protected void interruptNode(BattleContext battleContext, BattleInterrupt battleInterrupt){
 
 	}
 }

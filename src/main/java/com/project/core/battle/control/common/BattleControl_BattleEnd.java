@@ -11,7 +11,7 @@ public class BattleControl_BattleEnd extends BattleControl_BattleNode {
 	}
 
 	@Override
-	protected void execute1(BattleContext battleContext) {
+	protected void executeNode(BattleContext battleContext) {
 		battleContext.setExecuteCompleted(true);
 	}
 

@@ -6,6 +6,7 @@ public enum ActorType implements IEnumBase {
 	Skill(1),
 	Limit(2),
 	Buff(3),
+	EnemyUnit(4),
 	;
 
 	private final int id;

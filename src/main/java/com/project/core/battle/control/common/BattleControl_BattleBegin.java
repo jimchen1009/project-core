@@ -15,8 +15,8 @@ public class BattleControl_BattleBegin extends BattleControl_BattleNode {
 	}
 
 	@Override
-	protected void execute1(BattleContext battleContext) {
-		BattleUtil.updateChangeEnemyTeamUnit(battleContext.getBattle());
+	protected void executeNode(BattleContext battleContext) {
+		BattleUtil.updateChangeEnemyTeamUnit(battleContext);
 		BattleUtil.foreachBattleTeamUnit(battleContext.getBattle(), battleTeamUnit -> {
 			if (battleTeamUnit.getData().isInitializeCd()) {
 				BattleUtil.foreachBattleUnit(battleTeamUnit, BattleUnit::isAlive, BattleUnit::initSkillCD);
