@@ -82,12 +82,18 @@ public class Buff extends BattleXXX<BattleBuffData> {
 	}
 
 	public int decRemainRound(int decValue) {
+		if (decValue <= 0){
+			return 0;
+		}
 		int oldRemainRound = getRemainRound();
 		setRemainRound(Math.max(0, oldRemainRound - decValue));
 		return oldRemainRound - getRemainRound();
 	}
 
 	public int addRemainRound(int addValue) {
+		if (addValue <= 0){
+			return 0;
+		}
 		int oldRemainRound = getRemainRound();
 		int remainRound = oldRemainRound + addValue;
 		if (buffConfig.getMaxRound() > 0 && remainRound > buffConfig.getMaxRound()) {
@@ -134,8 +140,8 @@ public class Buff extends BattleXXX<BattleBuffData> {
 		return typeConfig;
 	}
 
-	public int getGeneraId(){
-		return buffConfig.getGeneraId();
+	public int buffGenera(){
+		return buffConfig.buffGenera();
 	}
 
 	public BuffDecPoint getBuffDecPoint(){

@@ -135,7 +135,7 @@ public class BuffConfig implements IConditionConfig {
         return data.getName();
     }
 
-    public int getGeneraId(){
+    public int buffGenera(){
         return data.getGeneraId();
     }
 

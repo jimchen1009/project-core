@@ -72,7 +72,7 @@ public class SkillDamage {
 	}
 
 	public SkillDamageUnit addSkillUnitDamage(BattleUnit damageUnit){
-		SkillUnitDamage_SkillUnit skillUnitDamage = new SkillUnitDamage_SkillUnit(attackUnit, damageUnit, damageType);
+		SkillDamageUnit skillUnitDamage = damageType.createDamageUnit(attackUnit, damageUnit);
 		skillUnitDamage.setCrit(isCrit).setMiss(isMiss);
 		unitDamageList.add(skillUnitDamage);
 		return skillUnitDamage;

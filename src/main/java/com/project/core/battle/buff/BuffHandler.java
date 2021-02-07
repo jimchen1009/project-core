@@ -30,7 +30,7 @@ public class BuffHandler {
 		List<BattleBuffData> buffDataList = battleUnit.getData().getBuffDataList();
 		for (BattleBuffData buffData : buffDataList) {
 			Buff addBuff = BuffUtil.createBuff(context.getBattle(), battleUnit, buffData);
-			checkAllAndAddBuff(context, new BuffContext(battleUnit, addBuff, false));
+			checkAllAndAddBuff(context, new BuffContext(null, battleUnit, addBuff, false));
 		}
 	}
 
@@ -55,7 +55,7 @@ public class BuffHandler {
 	 * @param battleContext
 	 * @param buffContext
 	 */
-	public static void removeBuff(BattleContext battleContext, BuffContext buffContext) {
+	public static void directRemoveBuff(BattleContext battleContext, BuffContext buffContext) {
 		buffContext.getBuffStrategy().directRemoveBuff(battleContext, buffContext);
 	}
 

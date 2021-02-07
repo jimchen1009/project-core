@@ -10,7 +10,6 @@ import com.project.core.battle.buff.dec.BuffDecPoint;
 import com.project.core.battle.condition.ConditionContext;
 import com.project.core.battle.condition.ConditionType;
 import com.project.core.battle.condition.IConditionContext;
-import com.project.core.battle.skill.damage.DamageType;
 import com.project.core.battle.skill.damage.SkillDamageUnit;
 import com.project.core.battle.skill.effect.ISkillEffectContext;
 import com.project.core.battle.skill.effect.SkillEffectContext;
@@ -34,10 +33,16 @@ public class SkillEffectContextUtil {
 		return skillDamageUnitList;
 	}
 
-	public static void onAllHealUnitSuccess(BattleContext battleContext, SkillEffectContext finalEffectContext){
-		Collection<SkillHealUnit> skillHealUnits = finalEffectContext.getAllSkillHealUnits();
+	public static void onAllHealUnitSuccess(BattleContext battleContext, SkillEffectContext effectContext){
+		Collection<SkillHealUnit> skillHealUnits = effectContext.getAllSkillHealUnits();
 		for (SkillHealUnit skillHealUnit : skillHealUnits) {
 			skillHealUnit.onHealSuccess(battleContext, new ConditionContext(), new SkillEffectContext());
+		}
+	}
+
+	public static void onAllDamageUnitSuccess(BattleContext battleContext, SkillEffectContext effectContext){
+		for (SkillDamageUnit skillDamageUnit : effectContext.getAllSkillDamageUnits()) {
+			skillDamageUnit.onDamageSuccess(battleContext,  null, new SkillEffectContext());
 		}
 	}
 
@@ -57,11 +62,7 @@ public class SkillEffectContextUtil {
 			SkillEffectUtil.doEffectAllPassiveSkillEffect(battleContext, targetUnit, requestUnit, SkillEffectType.CastSkillId, conditionContext, effectContext, request -> request.setConditionTypes(ConditionType.getTargetUsage()));
 		}
 
-		for (SkillDamageUnit skillDamageUnit : finalEffectContext.getAllSkillDamageUnits()) {
-			SkillEffectContext effectContext = new SkillEffectContext();
-			ConditionContext conditionContext = new ConditionContext(effectContext);
-			skillDamageUnit.onDamageSuccess(battleContext,  conditionContext, effectContext);
-		}
+		onAllDamageUnitSuccess(battleContext, finalEffectContext);
 
 		Map<Integer, BattleTeamUnit> attackCritTeamUnitMap = new HashMap<>();
 		Map<Long, BattleUnit> beCritBattleUnitMap = new HashMap<>();

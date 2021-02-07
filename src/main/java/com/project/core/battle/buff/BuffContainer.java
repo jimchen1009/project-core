@@ -2,7 +2,6 @@ package com.project.core.battle.buff;
 
 import com.game.common.util.CommonUtil;
 import com.project.core.battle.BattleUnit;
-import com.project.core.battle.buff.featrue.IBuffFeature;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -11,20 +10,23 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 public class BuffContainer implements Serializable {
 
-	private final BattleUnit hostBattleUnit;
+	private final BattleUnit battleUnit;
 
 	private final List<Buff> buffList;
 	private final Map<Integer, Container> containerMap;
 
-	public BuffContainer(BattleUnit hostBattleUnit) {
-		this.hostBattleUnit = hostBattleUnit;
+	public BuffContainer(BattleUnit battleUnit) {
+		this.battleUnit = battleUnit;
 		this.buffList = new ArrayList<>();
 		this.containerMap = new HashMap<>();
+	}
+
+	public BattleUnit getBattleUnit() {
+		return battleUnit;
 	}
 
 	public List<Buff> getBuffList() {
@@ -49,50 +51,6 @@ public class BuffContainer implements Serializable {
 	public Collection<Container> getTypeContainers(){
 		return containerMap.values();
 	}
-
-	/**
-	 * 直接添加BUFF
-	 * @param addBuff
-	 */
-	public void addBuff(Buff addBuff){
-		getTypeContainer(addBuff.getType()).addBuff(addBuff);
-	}
-
-	/**
-	 * 直接移除BUFF
-	 * @param removeBuff
-	 * @return
-	 */
-	public Buff removeBuff(Buff removeBuff){
-		Container container = containerMap.get(removeBuff.getType());
-		if (container == null){
-			return null;
-		}
-		return container.removeBuff(removeBuff);
-	}
-
-	public List<IBuffFeature> getFeatureList(Predicate<Buff> predicate) {
-		List<IBuffFeature> featureList = new ArrayList<>();
-		foreachFeature(predicate, featureList::add);
-		return featureList;
-	}
-
-	public void foreachFeature(Predicate<Buff> predicate, Consumer<IBuffFeature> consumer) {
-		List<Buff> buffList = getBuffList();
-		for (Buff buff : buffList) {
-			if (predicate == null || predicate.test(buff)) {
-				List<IBuffFeature> featureList = buff.getFeatureList();
-				for (IBuffFeature feature : featureList) {
-					consumer.accept(feature);
-				}
-			}
-		}
-	}
-
-	public BattleUnit getHostBattleUnit() {
-		return hostBattleUnit;
-	}
-
 
 	/**
 	 * 按照类型分类

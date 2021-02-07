@@ -8,9 +8,6 @@ import com.project.core.battle.buff.BuffContext;
 import com.project.core.battle.buff.BuffUtil;
 import com.project.core.battle.buff.dec.BuffDecPoint;
 import com.project.core.battle.result.ActionType;
-import com.project.core.battle.result.ActorActionBuff;
-import com.project.core.battle.result.ActorPlay;
-import com.project.core.battle.result.ActorType;
 
 import java.util.Collection;
 import java.util.List;
@@ -67,17 +64,50 @@ public abstract class BuffStrategyBase implements IBuffStrategy {
 				continue;
 			}
 			battleContext.addBuffPlayer(buff);
+			buff.decRemainRound(1);
 			BuffUtil.foreachBuffFeature(buff, feature -> feature.onDecBuffRound(battleContext));
+			BuffContext buffContext = new BuffContext(buff, true);
 			if (buff.isRemainRound()) {
-				battleContext.addBattleAction(new ActorActionBuff(battleUnit, battleUnit, ActionType.BuffChange, buff));
+				buffContext.addBattleAction(battleContext, ActionType.BuffChange);
 			}
 			else{
-				doRemoveBuffActionAndFeature(battleContext, new BuffContext(buff, true));
+				doRemoveBuffActionAndFeature(battleContext, buffContext);
 				removeOneAtLeast = true;
 			}
 		}
 		if (removeOneAtLeast){
 			onDirectRemoveBuffEvent(battleContext, battleUnit, typeContainer);
+		}
+	}
+
+	@Override
+	public final void changeBattleUnitBuffRound(BattleContext battleContext, Collection<BuffContext> buffContexts, int changeRound) {
+		if (changeRound == 0){
+			return;
+		}
+		BuffContext removeOneContext = null;
+		for (BuffContext buffContext : buffContexts) {
+			Buff buff = buffContext.getBuff();
+			battleContext.addBuffPlayer(buff);
+			if (changeRound > 0){
+				buff.addRemainRound(changeRound);
+				BuffUtil.foreachBuffFeature(buff, feature -> feature.onIncBuffRound(battleContext));
+				buffContext.addBattleAction(battleContext, ActionType.BuffChange);
+			}
+			else {
+				buff.decRemainRound(-changeRound);
+				BuffUtil.foreachBuffFeature(buff, feature -> feature.onDecBuffRound(battleContext));
+				if (buff.isRemainRound()) {
+					buffContext.addBattleAction(battleContext, ActionType.BuffChange);
+				}
+				else{
+					doRemoveBuffActionAndFeature(battleContext, buffContext);
+					removeOneContext = buffContext;
+				}
+			}
+		}
+		if (removeOneContext != null){
+			onDirectRemoveBuffEvent(battleContext, removeOneContext.getBattleUnit(), removeOneContext.getTypeContainer());
 		}
 	}
 
@@ -87,11 +117,8 @@ public abstract class BuffStrategyBase implements IBuffStrategy {
 	}
 
 	protected final void doAddBuffActionOnly(BattleContext battleContext, BuffContext buffContext){
-		Buff buff = buffContext.getBuff();
-		buff.setHostUnit(buffContext.getBattleUnit());
-		if (buffContext.isDoAction()){
-			battleContext.addBattleAction(new ActorActionBuff(null, buffContext.getBattleUnit(), ActionType.BuffAdd, buff));
-		}
+		buffContext.getBuff().setHostUnit(buffContext.getBattleUnit());
+		buffContext.addBattleAction(battleContext, ActionType.BuffAdd);
 	}
 
 	protected final void doAddBuffFeatureOnly(BattleContext battleContext, BuffContext buffContext){
@@ -99,11 +126,8 @@ public abstract class BuffStrategyBase implements IBuffStrategy {
 	}
 
 	protected final void doRemoveBuffActionAndFeature(BattleContext battleContext, BuffContext buffContext){
-		Buff buff = buffContext.getBuff();
-		if (buffContext.isDoAction()){
-			battleContext.addBattleAction(new ActorActionBuff(null, buffContext.getBattleUnit(), ActionType.BuffRemove, buff));
-		}
-		BuffUtil.foreachBuffFeature(buff, feature -> feature.onFeatureRemove(battleContext));
+		buffContext.addBattleAction(battleContext, ActionType.BuffRemove);
+		BuffUtil.foreachBuffFeature(buffContext.getBuff(), feature -> feature.onFeatureRemove(battleContext));
 	}
 
 	protected void onDirectRemoveBuffEvent(BattleContext battleContext, BattleUnit battleUnit, BuffContainer.Container typeContainer){

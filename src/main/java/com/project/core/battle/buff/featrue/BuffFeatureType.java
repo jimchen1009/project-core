@@ -10,6 +10,7 @@ public enum BuffFeatureType implements IEnumBase {
 	Attribute,
 	Shield,
 	Heal,
+	Poison,
 	;
 
 	public int getId() {

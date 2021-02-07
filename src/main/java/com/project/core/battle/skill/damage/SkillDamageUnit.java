@@ -101,7 +101,9 @@ public class SkillDamageUnit {
 	}
 
 	protected void beforeDoDamage(BattleContext battleContext, IConditionContext conditionContext, ISkillEffectContext effectContext){
-
+		DamageModifier modifier = new DamageModifier(type, damage);
+		BuffUtil.foreachBuffFeature(damageUnit, feature  -> feature.adjustFinalDamage(battleContext, effectContext, modifier), conditionContext);
+		damage = modifier.getDamage();
 	}
 
 	protected boolean startDoDamage(BattleContext battleContext, IConditionContext conditionContext, ISkillEffectContext effectContext){

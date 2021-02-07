@@ -1,9 +1,14 @@
 package com.project.core.battle.skill.damage;
 
 import com.game.common.util.IEnumBase;
+import com.project.core.battle.BattleUnit;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.lang.reflect.Constructor;
 
 public enum DamageType implements IEnumBase {
-	Skill("普通", true, true, SkillUnitDamage_SkillUnit.class),
+	Skill("普通", true, true, SkillDamageUnit.class),
 	QuakeBack("反震", false, false, SkillDamageUnit.class),
 	StrikeBack("反击", false, false, SkillDamageUnit.class),
 	Poison("中毒", false, false, SkillDamageUnit.class),
@@ -27,4 +32,17 @@ public enum DamageType implements IEnumBase {
 	public int getId() {
 		return ordinal();
 	}
+
+	public SkillDamageUnit createDamageUnit(BattleUnit requestUnit, BattleUnit damageUnit){
+		try {
+			Constructor<? extends SkillDamageUnit> constructor = aClass.getConstructor(BattleUnit.class, BattleUnit.class, DamageType.class);
+			return constructor.newInstance(requestUnit, damageUnit, this);
+		}
+		catch (Throwable throwable) {
+			logger.error("{}", this.name(), throwable);
+			return new SkillDamageUnit(requestUnit, damageUnit, this);
+		}
+	}
+
+	private static final Logger logger = LoggerFactory.getLogger(DamageType.class);
 }

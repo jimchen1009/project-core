@@ -45,13 +45,13 @@ public class SkillEffectTypeConfig {
         SkillEffectTypeConfig.configs = configMap;
         SkillEffectTypeConfig.configList = Collections.unmodifiableList(configList);
 
-//        StringBuilder builder = new StringBuilder();
-//        for (SkillEffectTypeConfig typeConfig : configList) {
-//            String format = String.format("%s(%s, \"%s\"),", typeConfig.data.getName(), typeConfig.getPrimaryId(), typeConfig.data.getComment());
-//            builder.append("\t").append(format).append("\n");
-//        }
-//        builder.append("\t").append(";");
-//        System.out.println(builder.toString());
+        StringBuilder builder = new StringBuilder();
+        for (SkillEffectTypeConfig typeConfig : configList) {
+            String format = String.format("%s(%s, \"%s\"),", typeConfig.data.getName(), typeConfig.getPrimaryId(), typeConfig.data.getComment());
+            builder.append("\t").append(format).append("\n");
+        }
+        builder.append("\t").append(";");
+        System.out.println(builder.toString());
     }
 
     public static List<SkillEffectTypeConfig> getAllConfigs() {

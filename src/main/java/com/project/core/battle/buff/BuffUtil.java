@@ -1,10 +1,12 @@
 package com.project.core.battle.buff;
 
+import com.game.common.util.CommonUtil;
 import com.project.core.battle.Battle;
 import com.project.core.battle.BattleContext;
 import com.project.core.battle.BattleUnit;
 import com.project.core.battle.buff.dec.BuffDecPoint;
 import com.project.core.battle.buff.featrue.IBuffFeature;
+import com.project.core.battle.buff.type.BuffStrategy;
 import com.project.core.battle.condition.IConditionContext;
 import com.project.core.battle.model.BattleBuffData;
 import com.project.core.battle.skill.damage.DamageModifier;
@@ -12,10 +14,16 @@ import com.project.core.battle.skill.damage.DamageType;
 import com.project.core.battle.skill.effect.ISkillEffectContext;
 import com.project.core.battle.skill.effect.ext.SkillBattleUnit;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 public class BuffUtil {
 
@@ -84,6 +92,16 @@ public class BuffUtil {
 		}
 	}
 
+	public static void foreachBuff(BattleUnit battleUnit, IConditionContext conditionContext, Consumer<Buff> consumer){
+		List<Buff> buffList = battleUnit.getBuffContainer().getBuffList();
+		for (Buff buff : buffList) {
+			if (predicateCondition(battleUnit, buff, conditionContext)){
+				continue;
+			}
+			consumer.accept(buff);
+		}
+	}
+
 	public static void foreachBuffFeature(Buff buff, Consumer<IBuffFeature> consumer){
 		List<IBuffFeature> featureList = buff.getFeatureList();
 		for (IBuffFeature feature : featureList) {
@@ -100,7 +118,7 @@ public class BuffUtil {
 			return true;
 		}
 		SkillBattleUnit skillBattleUnit = conditionContext.getSkillBattleUnit(battleUnit.getId());
-		return skillBattleUnit != null && skillBattleUnit.isIgnoreGenera(buff.getGeneraId());
+		return skillBattleUnit != null && skillBattleUnit.isIgnoreGenera(buff.buffGenera());
 	}
 
 	public static void decBattleUnitBuffRound(BattleContext battleContext, BattleUnit battleUnit, BuffDecPoint decPoint) {
@@ -114,6 +132,17 @@ public class BuffUtil {
 				continue;
 			}
 			typeConfig.getStrategy().decBattleUnitBuffRound(battleContext, battleUnit, container, decPoint);
+		}
+	}
+
+	public static void changeBattleUnitBuffRound(BattleContext battleContext, Collection<BuffContext> buffContexts, int changeRound) {
+		Set<Long> battleUnitIds = buffContexts.stream().map(buffContext -> buffContext.getBattleUnit().getId()).collect(Collectors.toSet());
+		if (battleUnitIds.size() != 1){
+			return;		//增加检测~
+		}
+		Map<BuffStrategy, ArrayList<BuffContext>> buffListMap = CommonUtil.splitUp1Into1Group(new EnumMap<>(BuffStrategy.class), buffContexts, ArrayList::new, BuffContext::getBuffStrategy);
+		for (Map.Entry<BuffStrategy, ArrayList<BuffContext>> entry : buffListMap.entrySet()) {
+			entry.getKey().changeBattleUnitBuffRound(battleContext, entry.getValue(), changeRound);
 		}
 	}
 

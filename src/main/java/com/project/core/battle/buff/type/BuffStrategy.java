@@ -7,6 +7,8 @@ import com.project.core.battle.buff.BuffContainer;
 import com.project.core.battle.buff.BuffContext;
 import com.project.core.battle.buff.dec.BuffDecPoint;
 
+import java.util.Collection;
+
 public enum BuffStrategy implements IEnumBase, IBuffStrategy {
 
 	Old(0, "保留旧", new BuffStrategy_Old()),
@@ -44,5 +46,10 @@ public enum BuffStrategy implements IEnumBase, IBuffStrategy {
 	@Override
 	public void decBattleUnitBuffRound(BattleContext battleContext, BattleUnit battleUnit, BuffContainer.Container typeContainer, BuffDecPoint decPoint) {
 		strategy.decBattleUnitBuffRound(battleContext, battleUnit, typeContainer, decPoint);
+	}
+
+	@Override
+	public void changeBattleUnitBuffRound(BattleContext battleContext, Collection<BuffContext> buffContexts, int changeRound) {
+		strategy.changeBattleUnitBuffRound(battleContext, buffContexts, changeRound);
 	}
 }

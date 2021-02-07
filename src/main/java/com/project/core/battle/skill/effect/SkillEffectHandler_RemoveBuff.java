@@ -3,11 +3,11 @@ package com.project.core.battle.skill.effect;
 import com.project.core.battle.BattleContext;
 import com.project.core.battle.BattleUnit;
 import com.project.core.battle.buff.Buff;
-import com.project.core.battle.buff.BuffContainer;
+import com.project.core.battle.buff.BuffContext;
+import com.project.core.battle.buff.BuffHandler;
+import com.project.core.battle.buff.BuffUtil;
 import com.project.core.battle.condition.ConditionType;
 import com.project.core.battle.condition.IConditionContext;
-import com.project.core.battle.result.ActionType;
-import com.project.core.battle.result.ActorActionBuff;
 import com.project.core.battle.skill.BattleSkill;
 import com.project.core.battle.skill.SkillEffectUtil;
 import com.project.core.battle.skill.SkillOccasion;
@@ -36,22 +36,19 @@ public class SkillEffectHandler_RemoveBuff extends SkillEffectHandler {
 			return false;
 		}
 
-		BuffContainer buffContainer = targetUnit.getBuffContainer();
 		ArrayList<Buff> buffList = new ArrayList<>();
-		for (Buff buff : buffContainer.getBuffList()) {
-			int generaId = buff.getGeneraId();
-			if (generaId != this.generaId || !buff.getTypeConfig().isCanRemove()) {
-				continue;
+		BuffUtil.foreachBuff(targetUnit, null, buff -> {
+			if (buff.buffGenera() != generaId || !buff.getTypeConfig().isCanRemove()) {
+				return;
 			}
 			buffList.add(buff);
-		}
+		});
 		List<Buff> selectBuffList = battleContext.getBattle().getRandom().select(buffList, num);
 		if (selectBuffList.isEmpty()) {
 			return false;
 		}
 		for (Buff buff : selectBuffList) {
-			buffContainer.removeBuff(buff);
-			battleContext.addBattleAction(new ActorActionBuff(requestUnit, targetUnit, ActionType.BuffRemove, buff));
+			BuffHandler.directRemoveBuff(battleContext, new BuffContext(buff, false));
 		}
 
 		List<ConditionType> myConditionTypeList = new ArrayList<>();

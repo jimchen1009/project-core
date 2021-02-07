@@ -1,7 +1,7 @@
 package com.project.core.battle.buff.featrue;
 
-import com.game.common.util.SupplyHolder;
 import com.game.common.util.IncInteger;
+import com.game.common.util.SupplyHolder;
 import com.project.core.battle.BattleContext;
 import com.project.core.battle.BattleUnit;
 import com.project.core.battle.attribute.Attribute;
@@ -36,7 +36,7 @@ public interface IBuffFeature {
 
 	void onBattleEndRound(BattleContext context);
 
-	void onIncBuffRound(BattleContext context, BuffContext buffContext);
+	void onIncBuffRound(BattleContext context);
 
 	void onDecBuffRound(BattleContext context);
 
@@ -69,4 +69,6 @@ public interface IBuffFeature {
 	void onBeDamage(BattleContext context, SkillDamageUnit damageUnit);
 
 	void onEndRoundHeal(BattleContext context, SupplyHolder<SkillHealUnit> holder);
+
+	void onEndRoundPoison(BattleContext context, SupplyHolder<SkillDamageUnit> holder);
 }

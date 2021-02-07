@@ -65,7 +65,7 @@ public abstract class BuffFeature implements IBuffFeature{
 	}
 
 	@Override
-	public void onIncBuffRound(BattleContext context, BuffContext buffContext) {
+	public void onIncBuffRound(BattleContext context) {
 
 	}
 
@@ -145,6 +145,11 @@ public abstract class BuffFeature implements IBuffFeature{
 
 	@Override
 	public void onEndRoundHeal(BattleContext context, SupplyHolder<SkillHealUnit> holder) {
+
+	}
+
+	@Override
+	public void onEndRoundPoison(BattleContext context, SupplyHolder<SkillDamageUnit> holder) {
 
 	}
 }

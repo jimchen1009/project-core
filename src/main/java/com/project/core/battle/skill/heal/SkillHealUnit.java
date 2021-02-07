@@ -2,6 +2,7 @@ package com.project.core.battle.skill.heal;
 
 import com.game.common.util.DecideBool;
 import com.project.core.battle.BattleContext;
+import com.project.core.battle.BattleMath;
 import com.project.core.battle.BattleUnit;
 import com.project.core.battle.attribute.Attribute;
 import com.project.core.battle.attribute.BaseAttributes;
@@ -44,12 +45,12 @@ public class SkillHealUnit {
 
 
 	public SkillHealUnit incHealHpRate(int incRate) {
-		this.healHpRate += incRate;
+		this.healHpRate = BattleMath.addExact(healHpRate, incRate);
 		return this;
 	}
 
 	public SkillHealUnit incHealHp(int incHp) {
-		this.healHp += incHp;
+		this.healHp = BattleMath.addExact(healHp, incHp);
 		return this;
 	}
 
@@ -81,9 +82,9 @@ public class SkillHealUnit {
 	}
 
 	protected boolean startDoHeal(BattleContext battleContext, IConditionContext conditionContext, ISkillEffectContext effectContext){
-		int incHp = (int) ((long) healUnit.getAttribute(Attribute.thp) * healHpRate / 1000);
+		int incHp = BattleMath.rate1000(healUnit.getAttribute(Attribute.thp), healHpRate);
 		if (healHp > 0) {
-			incHp += healHp;
+			incHp = BattleMath.addExact(incHp, healHp);
 		}
 		if (BuffUtil.predicateFeatureUtilOneOkBool(healUnit, feature -> !feature.canHeal())) {
 			incHp = 0;
@@ -91,7 +92,7 @@ public class SkillHealUnit {
 		int hp = healUnit.getAttribute(Attribute.hp);
 		int maxInc = healUnit.getAttribute(Attribute.thp) - hp;
 		doHealHp = Math.min(incHp, Math.max(0, maxInc));
-		healUnit.setAttribute(Attribute.hp, hp + doHealHp);
+		healUnit.setAttribute(Attribute.hp, BattleMath.addExact(hp, doHealHp));
 		return true;
 	}
 }

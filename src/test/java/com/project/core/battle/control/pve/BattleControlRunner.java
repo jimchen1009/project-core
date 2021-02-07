@@ -26,13 +26,14 @@ public class BattleControlRunner {
 	private static List<Integer> skillConfigIds0 = Arrays.asList(41200007, 41200008, 41200009);
 	private static List<Integer> skillConfigIds1 = Arrays.asList(41200107, 41200108, 41200109);
 	private static List<Integer> skillConfigIds3 = Arrays.asList(41200307, 41200308, 41200309);
+	private static List<Integer> skillConfigIds4 = Arrays.asList(41200207, 41200208, 41200209);
 
 	private static final List<TeamConfig> TeamAConfigList = Arrays.asList(
 			new TeamConfig(11090, skillConfigIds3)
 	);
 
 	private static final List<TeamConfig> TeamBConfigList = Arrays.asList(
-			new TeamConfig(11090, skillConfigIds3)
+			new TeamConfig(11090, skillConfigIds4)
 	);
 
 	private static final int TeamUnit = Math.min(TeamAConfigList.size(), TeamBConfigList.size());
@@ -46,7 +47,7 @@ public class BattleControlRunner {
 	}
 
 	private Battle executePVEAI(){
-		return executeAI(BattleType.PVP, battle -> {
+		return executeAI(BattleType.PVE, battle -> {
 			BattleControlService.executeAI(1, battle);
 		}, userId -> userId % 2);
 	}

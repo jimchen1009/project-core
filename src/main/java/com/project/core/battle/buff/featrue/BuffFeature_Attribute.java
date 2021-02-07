@@ -6,6 +6,7 @@ import com.game.common.expression.ExprParams;
 import com.game.common.expression.IExpression;
 import com.game.common.util.IEnumBase;
 import com.project.core.battle.BattleContext;
+import com.project.core.battle.BattleMath;
 import com.project.core.battle.BattleUnit;
 import com.project.core.battle.attribute.Attribute;
 import com.project.core.battle.attribute.AttributeType;
@@ -42,10 +43,9 @@ public class BuffFeature_Attribute extends BuffFeature {
 		params.put("round", buff.getRemainRound());
 		battleUnit.attributeParams(params);
 		addInt = valueExpression.calculateInt(params);
-		int rate = rateExpression.calculateInt(params);
-		addInt += (int) ((long) baseValue * rate / 1000);
+		int rateValue = BattleMath.rate1000(baseValue, rateExpression.calculateInt(params));
 		int attributeValue = battleUnit.getAttribute(attribute);
-		battleUnit.setAttribute(attribute, attributeValue + addInt);
+		battleUnit.setAttribute(attribute, BattleMath.addExact(addInt, rateValue, attributeValue));
 		context.addBattleAction(new ActorActionAttribute(null, battleUnit, attribute));
 	}
 

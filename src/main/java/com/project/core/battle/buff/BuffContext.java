@@ -1,21 +1,24 @@
 package com.project.core.battle.buff;
 
+import com.project.core.battle.BattleContext;
 import com.project.core.battle.BattleUnit;
-import com.project.core.battle.buff.type.IBuffStrategy;
-
-import java.util.Objects;
+import com.project.core.battle.buff.type.BuffStrategy;
+import com.project.core.battle.result.ActionType;
+import com.project.core.battle.result.ActorActionBuff;
 
 public class BuffContext {
 
+	private final BattleUnit requestUnit;
 	private final BattleUnit battleUnit;
 	private final Buff buff;
 	private final boolean isDoAction;
 
 	public BuffContext(Buff buff, boolean isDoAction) {
-		this(Objects.requireNonNull(buff.getHostUnit()), buff, isDoAction);
+		this(buff.getHostUnit(), buff.getHostUnit(), buff, isDoAction);
 	}
 
-	public BuffContext(BattleUnit battleUnit, Buff buff, boolean isDoAction) {
+	public BuffContext(BattleUnit requestUnit, BattleUnit battleUnit, Buff buff, boolean isDoAction) {
+		this.requestUnit = requestUnit;
 		this.battleUnit = battleUnit;
 		this.buff = buff;
 		this.isDoAction = isDoAction;
@@ -29,10 +32,6 @@ public class BuffContext {
 		return buff;
 	}
 
-	public boolean isDoAction() {
-		return isDoAction;
-	}
-
 	public BuffContainer.Container getTypeContainer(){
 		BuffContainer buffContainer = battleUnit.getBuffContainer();
 		return buffContainer.getTypeContainer(buff.getType());
@@ -42,11 +41,15 @@ public class BuffContext {
 		return battleUnit.getBuffContainer();
 	}
 
-	public IBuffStrategy getBuffStrategy(){
+	public BuffStrategy getBuffStrategy(){
 		return buff.getTypeConfig().getStrategy();
 	}
 
 	public BuffContext changeBuff(Buff buff){
-		return new BuffContext(battleUnit, buff, isDoAction);
+		return new BuffContext(requestUnit, battleUnit, buff, isDoAction);
+	}
+
+	public void addBattleAction(BattleContext battleContext, ActionType actionType){
+		battleContext.addBattleAction(new ActorActionBuff(requestUnit, battleUnit, actionType, buff, isDoAction));
 	}
 }
