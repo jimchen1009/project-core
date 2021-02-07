@@ -28,6 +28,14 @@ public class BattleSkillData implements IBattleXXXData<BattleSkillData> {
 		this.cd = cd;
 	}
 
+	public void incCd(int inc){
+		this.cd += inc;
+	}
+
+	public void decCd(int dec){
+		this.cd -= dec;
+	}
+
 	@Override
 	public BattleSkillData deepCopy() {
 		return new BattleSkillData(index, skillId, cd);

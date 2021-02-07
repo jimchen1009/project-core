@@ -20,8 +20,8 @@ import com.project.core.battle.model.BattleData;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.function.BiFunction;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 public class BattleControlService {
 
@@ -96,34 +96,35 @@ public class BattleControlService {
 
 
 	private static TupleCode<BattleContext> execute(long operateUserId, Battle battle, Consumer<BattleContext> consumer){
-		TupleCode<BattleContext> resultCode = invoke(operateUserId, battle, (battleControl, battleContext) -> {
+		BattleContext battleContext = new BattleContext(operateUserId, battle);
+		ResultCode resultCode = invoke(battleContext, battleControl -> {
 			consumer.accept(battleContext);
 			return battleControl.execute(battleContext);
 		});
-		if (resultCode.isSuccess()){
-			TupleCode<BattleContext> skipCode = resultCode;
-			while (skipCode.isSuccess()){
-				skipCode = invoke(operateUserId, battle, BattleControl::skip);
-			}
-			BattleContext battleContext = resultCode.getData();
-			System.out.println("执行结果:" + battleContext.getActorPlayer() + "\n");
+		if (!resultCode.isSuccess()){
+			return new TupleCode<>(resultCode);
 		}
-		return resultCode;
+		ResultCode skipCode = ResultCode.SUCCESS;
+		while (skipCode.isSuccess()){
+			skipCode = invoke(battleContext, battleControl -> battleControl.skip(battleContext));
+		}
+		System.out.println("执行结果:" + battleContext.getActorPlayer() + "\n");
+		return new TupleCode<>(battleContext);
 	}
 
-	private static TupleCode<BattleContext> invoke(long operateUserId, Battle battle, BiFunction<BattleControl, BattleContext, ResultCode> function){
+	private static ResultCode invoke(BattleContext battleContext, Function<BattleControl, ResultCode> function){
+		Battle battle = battleContext.getBattle();
 		if (battle.isBattleStage(BattleStage.BattleFinal)) {
-			return new TupleCode<>(ResultCode.BATTLE_CONTROL_TAG);
+			return ResultCode.BATTLE_CONTROL_TAG;
 		}
-		BattleContext battleContext = new BattleContext(operateUserId, battle);
 		BattleControl battleControl = getBattleControl(battle.getBattleType());
-		ResultCode resultCode = function.apply(battleControl, battleContext);
+		ResultCode resultCode = function.apply(battleControl);
 		if (!resultCode.isSuccess()) {
-			return new TupleCode<>(resultCode);
+			return resultCode;
 		}
 		if (!battle.isBattleStage(BattleStage.BattleFinal)) {
 			battleControl.onInitialization(battleContext);
 		}
-		return new TupleCode<>(battleContext);
+		return ResultCode.SUCCESS;
 	}
 }

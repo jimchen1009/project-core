@@ -9,6 +9,7 @@ import com.project.core.battle.buff.Buff;
 import com.project.core.battle.buff.BuffUtil;
 import com.project.core.battle.buff.dec.BuffDecPoint;
 import com.project.core.battle.control.BattleControlId;
+import com.project.core.battle.skill.BattleSkill;
 import com.project.core.battle.skill.SkillEffectContextUtil;
 import com.project.core.battle.skill.effect.SkillEffectContext;
 import com.project.core.battle.skill.heal.HealType;
@@ -29,6 +30,9 @@ public class BattleControl_RoundEnd extends BattleControl_ReadyNode {
 			BuffUtil.decBattleUnitBuffRound(battleContext, battleUnit, BuffDecPoint.EndRound);
 		});
 		BattleUtil.foreachBattleUnitBuffFeature(battleContext.getBattle(), BattleUnit::isAlive, feature -> feature.onBattleEndRound(battleContext));
+		BattleUtil.foreachBattleUnit(battleContext.getBattle(), BattleUnit::isAlive, battleUnit -> {
+			battleUnit.getSkillList().forEach(BattleSkill::decEndRoundCD);
+		});
 	}
 
 	@Override

@@ -43,6 +43,14 @@ public class BattleSkill extends BattleXXX<BattleSkillData> {
 		return getData().getCd();
 	}
 
+	public boolean decEndRoundCD() {
+		if (getData().getCd() <= 0) {
+			return false;
+		}
+		getData().decCd(1);
+		return true;
+	}
+
 	public boolean isPassiveSkill(){
 		return skillConfig.isPassiveSkill();
 	}
