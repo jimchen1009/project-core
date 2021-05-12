@@ -51,7 +51,7 @@ public class SkillEffectTypeConfig {
             builder.append("\t").append(format).append("\n");
         }
         builder.append("\t").append(";");
-        System.out.println(builder.toString());
+//        System.out.println(builder.toString());
     }
 
     public static List<SkillEffectTypeConfig> getAllConfigs() {

@@ -29,10 +29,12 @@ public class BattleControlRunner {
 	private static List<Integer> skillConfigIds4 = Arrays.asList(41200207, 41200208, 41200209);
 
 	private static final List<TeamConfig> TeamAConfigList = Arrays.asList(
+			new TeamConfig(11090, skillConfigIds1),
 			new TeamConfig(11090, skillConfigIds3)
 	);
 
 	private static final List<TeamConfig> TeamBConfigList = Arrays.asList(
+			new TeamConfig(11090, skillConfigIds1),
 			new TeamConfig(11090, skillConfigIds4)
 	);
 

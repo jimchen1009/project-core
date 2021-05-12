@@ -2,6 +2,8 @@ package com.project.core.config.data;
 
 import com.project.config.IDataSource;
 import com.project.core.config.EnvConfigs;
+import jodd.io.findfile.ClassScanner;
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -68,39 +70,29 @@ public class DataConfigs {
 	 */
 	private static Map<String, IDataSource> initDataSourceClasses(){
 		Map<String, IDataSource> dataSourceMap = new HashMap<>();
-		try {
-			Enumeration<URL> resources = Thread.currentThread().getContextClassLoader().getResources(PackageName.replace('.', '/'));
-			URL url = resources.nextElement();
-			//获取包的物理路径
-			String filePath = URLDecoder.decode(url.getFile(), "UTF-8");
-			File directory = new File(filePath);
-			if (directory.isDirectory()) {
-				File[] files = Objects.requireNonNull(directory.listFiles());
-				for (File file : files) {
-					if (file.isDirectory()) {
-						continue;
-					}
-					int length = file.getName().length() - 6;
-					if (file.getName().lastIndexOf(".class") != length) {
-						continue;
-					}
-					String className = file.getName().substring(0, length);
+		ClassScanner scanner = new ClassScanner(){
+			@Override
+			protected void onEntry(EntryData entryData) {
+				super.onEntry(entryData);
+				String className = PackageName + '.' + entryData.name();
+				try {
 					// 经过回复同学的提醒，这里用forName有一些不好，会触发static方法，没有使用classLoader的load干净
-					Class<?> loadClass = Thread.currentThread().getContextClassLoader().loadClass(PackageName + '.' + className);
+					Class<?> loadClass = Thread.currentThread().getContextClassLoader().loadClass(className);
 					if (!IDataSource.class.isAssignableFrom(loadClass)) {
-						continue;
+						return;
 					}
 					IDataSource dataSource = (IDataSource)loadClass.newInstance();
 					dataSourceMap.put(dataSource.getClass().getName(), dataSource);
 				}
+				catch (Throwable throwable){
+					logger.error("newInstance class error, name={}", className, throwable);
+				}
 			}
-			else {
-				logger.error("it's not directory, name={}", directory.getAbsolutePath());
-			}
-		}
-		catch (Throwable t){
-			logger.error("load package classes error, name={}", PackageName, t);
-		}
+		};
+		scanner.excludeAllJars(true);
+		scanner.includeResources(false);
+		URL resource = Thread.currentThread().getContextClassLoader().getResource(PackageName.replace('.', '/'));
+		scanner.scan(resource).start();
 		return dataSourceMap;
 	}
 

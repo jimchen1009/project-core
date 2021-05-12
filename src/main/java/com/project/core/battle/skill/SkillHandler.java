@@ -1,6 +1,7 @@
 package com.project.core.battle.skill;
 
 import com.project.core.battle.BattleContext;
+import com.project.core.battle.BattleMath;
 import com.project.core.battle.BattleUnit;
 import com.project.core.battle.BattleUnitContext;
 import com.project.core.battle.BattleUtil;
@@ -306,7 +307,7 @@ public class SkillHandler {
 			return 0;
 		}
 
-		int ignoreDef = targetUnit.getAttribute(Attribute.def) * ignoreDefRate / 1000;
+		int ignoreDef = BattleMath.rate1000(targetUnit.getAttribute(Attribute.def), ignoreDefRate);
 		return Math.max(0, def - ignoreDef);
 	}
 
