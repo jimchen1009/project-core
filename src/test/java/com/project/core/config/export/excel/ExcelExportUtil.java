@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.game.common.config.EvnConfigUtil;
 import com.game.common.config.IEvnConfig;
 import com.game.common.util.DateFormatUtil;
+import com.game.common.util.DateUtil;
 import com.project.config.IDataSource;
 import com.project.core.config.data.DataMapper;
 import com.project.core.config.export.ModelExportField;
@@ -33,7 +34,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -108,7 +108,7 @@ public class ExcelExportUtil {
 
 		String javaDirectory = checkAndGetDirectory(config, "javaPath");
 		String javaPackage = config.getString("javaPackage");
-		String annotation = "文件创建时间:" + DateFormatUtil.formatYMDHMS(new Date()) + " 创建者:" + System.getProperties().getProperty("user.name") + "\n";
+		String annotation = "文件创建时间:" + DateFormatUtil.formatYMDHMS(DateUtil.nowLocalDateTime()) + " 创建者:" + System.getProperties().getProperty("user.name") + "\n";
 
 
 		String javaDataClassName = javaClassName + "Data";
