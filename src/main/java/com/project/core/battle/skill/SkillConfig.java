@@ -93,7 +93,7 @@ public class SkillConfig {
         this.selectUnitSelector = IEnumBase.findOne(BattleUnitSelectorType.values(), data.getEffectTarget());
         this.effectConfigList = createEffectConfigs(data);
         this.condition2EffectList = CommonUtil.splitUp1Into1Group(new EnumMap<>(ConditionType.class), effectConfigList, ArrayList::new, SkillEffectConfig::getSkillConditionType);
-        this.effect2EffectList = CommonUtil.splitUpIntoNGroup(new EnumMap<>(SkillEffectType.class), effectConfigList, ArrayList::new,
+        this.effect2EffectList = CommonUtil.splitUp1IntoNGroup(new EnumMap<>(SkillEffectType.class), effectConfigList, ArrayList::new,
                 config -> config.getEffectUnitConfigs().stream().map(SkillEffectUnitConfig::getEffectType).collect(Collectors.toList()));
     }
 

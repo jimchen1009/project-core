@@ -97,7 +97,7 @@ public class DataConfigs {
 	}
 
 	private static void reloadDataSourceJson(IDataSource dataSource) throws IOException{
-		String resourceJson = EnvConfigs.getString("configPath.resourceJson");
+		String resourceJson = EnvConfigs.getString("resourceJson");
 		String filePath = resourceJson + File.separator + dataSource.getName();
 		dataSource.loadFile(filePath);
 	}
